@@ -49,6 +49,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CPL_crs_from_input
+Rcpp::List CPL_crs_from_input(Rcpp::CharacterVector input);
+RcppExport SEXP _sf_CPL_crs_from_input(SEXP inputSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type input(inputSEXP);
+    rcpp_result_gen = Rcpp::wrap(CPL_crs_from_input(input));
+    return rcpp_result_gen;
+END_RCPP
+}
 // CPL_crs_parameters
 Rcpp::List CPL_crs_parameters(Rcpp::List crs);
 RcppExport SEXP _sf_CPL_crs_parameters(SEXP crsSEXP) {
@@ -69,17 +80,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type crs1(crs1SEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type crs2(crs2SEXP);
     rcpp_result_gen = Rcpp::wrap(CPL_crs_equivalent(crs1, crs2));
-    return rcpp_result_gen;
-END_RCPP
-}
-// CPL_crs_from_input
-Rcpp::List CPL_crs_from_input(Rcpp::CharacterVector input);
-RcppExport SEXP _sf_CPL_crs_from_input(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(CPL_crs_from_input(input));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1143,9 +1143,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sf_CPL_gdal_init", (DL_FUNC) &_sf_CPL_gdal_init, 0},
     {"_sf_CPL_gdal_cleanup_all", (DL_FUNC) &_sf_CPL_gdal_cleanup_all, 0},
     {"_sf_CPL_gdal_version", (DL_FUNC) &_sf_CPL_gdal_version, 1},
+    {"_sf_CPL_crs_from_input", (DL_FUNC) &_sf_CPL_crs_from_input, 1},
     {"_sf_CPL_crs_parameters", (DL_FUNC) &_sf_CPL_crs_parameters, 1},
     {"_sf_CPL_crs_equivalent", (DL_FUNC) &_sf_CPL_crs_equivalent, 2},
-    {"_sf_CPL_crs_from_input", (DL_FUNC) &_sf_CPL_crs_from_input, 1},
     {"_sf_CPL_roundtrip", (DL_FUNC) &_sf_CPL_roundtrip, 1},
     {"_sf_CPL_circularstring_to_linestring", (DL_FUNC) &_sf_CPL_circularstring_to_linestring, 1},
     {"_sf_CPL_multisurface_to_multipolygon", (DL_FUNC) &_sf_CPL_multisurface_to_multipolygon, 1},

@@ -17,16 +17,16 @@ CPL_gdal_version <- function(what = "RELEASE_NAME") {
     .Call('_sf_CPL_gdal_version', PACKAGE = 'sf', what)
 }
 
+CPL_crs_from_input <- function(input) {
+    .Call('_sf_CPL_crs_from_input', PACKAGE = 'sf', input)
+}
+
 CPL_crs_parameters <- function(crs) {
     .Call('_sf_CPL_crs_parameters', PACKAGE = 'sf', crs)
 }
 
 CPL_crs_equivalent <- function(crs1, crs2) {
     .Call('_sf_CPL_crs_equivalent', PACKAGE = 'sf', crs1, crs2)
-}
-
-CPL_crs_from_input <- function(input) {
-    .Call('_sf_CPL_crs_from_input', PACKAGE = 'sf', input)
 }
 
 CPL_roundtrip <- function(sfc) {

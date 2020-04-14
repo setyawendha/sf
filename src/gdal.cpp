@@ -143,7 +143,21 @@ Rcpp::CharacterVector CPL_wkt_from_user_input(Rcpp::CharacterVector input) {
 	return(out);
 }
 
-Rcpp::List fix_old_style(Rcpp::List crs) {
+// [[Rcpp::export]]
+Rcpp::List CPL_crs_from_input(Rcpp::CharacterVector input) {
+	OGRSpatialReference *ref = new OGRSpatialReference;
+	handle_axis_order(ref);
+	Rcpp::List crs;
+	if (ref->SetFromUserInput(input[0]) == OGRERR_NONE) {
+		crs = create_crs(ref, false);
+		crs(0) = input;
+	} else
+		crs = create_crs(NULL);
+	delete ref;
+	return crs;
+}
+
+Rcpp::List fix_crs(Rcpp::List crs) {
 	Rcpp::CharacterVector n = crs.attr("names");
 	if (n[0] == "epsg") { // create new: // #nocov start
 		Rcpp::List ret(2);
@@ -156,24 +170,39 @@ Rcpp::List fix_old_style(Rcpp::List crs) {
 		ret.attr("names") = names;
 		ret.attr("class") = "crs";
 		return ret; // #nocov end
-	} else
+	} else {
+		if (n[0] != "input" || n[1] != "wkt")
+			Rcpp::stop("crs object with invalid names");
+		Rcpp::CharacterVector input = crs[0];
+		Rcpp::CharacterVector wkt = crs[1];
+		if (!Rcpp::CharacterVector::is_na(input[0]) && Rcpp::CharacterVector::is_na(wkt[0])) { // fix wkt:
+			Rcpp::Rcout << "(fixing incomplete crs not created by package sf ";
+			crs = CPL_crs_from_input(input);
+			wkt = crs[1];
+			if (Rcpp::CharacterVector::is_na(wkt[0])) {
+				Rcpp::Rcout << "failed on \"" << input[0] << "\")" << std::endl;
+				Rcpp::stop("invalid crs object");
+			} else
+				Rcpp::Rcout << "succeeded)" << std::endl;
+		}
 		return crs;
+	}
 }
 
 OGRSpatialReference *OGRSrs_from_crs(Rcpp::List crs) {
 	// fix old-style crs:
-	crs = fix_old_style(crs);
+	crs = fix_crs(crs);
 	OGRSpatialReference *dest = NULL;
 	Rcpp::CharacterVector wkt = crs[1];
 	if (! Rcpp::CharacterVector::is_na(wkt[0])) {
 		dest = new OGRSpatialReference;
 		dest = handle_axis_order(dest);
-		char *cp = wkt[0];
 #if GDAL_VERSION_MAJOR <= 2 && GDAL_VERSION_MINOR <= 2
-		handle_error(dest->importFromWkt(&cp));
+		char *cp = wkt[0];
 #else
-		handle_error(dest->importFromWkt((const char *) cp));
+		const char *cp = wkt[0];
 #endif
+		handle_error(dest->importFromWkt(&cp));
 	}
 	return dest;
 }
@@ -399,20 +428,6 @@ Rcpp::List sfc_from_ogr(std::vector<OGRGeometry *> g, bool destroy = false) {
 	ret.attr("crs") = crs;
 	ret.attr("class") = "sfc";
 	return ret;
-}
-
-// [[Rcpp::export]]
-Rcpp::List CPL_crs_from_input(Rcpp::CharacterVector input) {
-	OGRSpatialReference *ref = new OGRSpatialReference;
-	handle_axis_order(ref);
-	Rcpp::List crs;
-	if (ref->SetFromUserInput(input[0]) == OGRERR_NONE) {
-		crs = create_crs(ref, false);
-		crs(0) = input;
-	} else
-		crs = create_crs(NULL);
-	delete ref;
-	return crs;
 }
 
 // [[Rcpp::export]]
