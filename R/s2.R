@@ -12,6 +12,7 @@ earth_radius = 6371000.0
 #' 
 #' functions for spherical geometry, using the s2 package based on the google s2 library
 #' @name s2 
+#' @param to_p4s target CRS; defaults to "+proj=geocent +a=6371000 +b=6371000"
 #' @export
 #' @details \code{st_as_s2} converts an \code{sf} POLYGON object into a form readable by \code{s2}.
 st_as_s2 = function(x, to_p4s = s2_p4s) {
@@ -35,6 +36,7 @@ load_s2 = function() {
 #' @param x object of class \code{sf}, or \code{sfc}
 #' @param ... passed on to \link{st_transform}
 #' @param crs object of class \code{crs}
+#' @param radius numeric; Earth radius in m; defaults to 6371000.0
 st_as_sfc.S2Polygon = function(x, ..., crs = st_crs(4326), radius = earth_radius) {
 	# close all loops:
 	loops = lapply(x$loops, function(L) rbind(L, L[1,]) * radius)

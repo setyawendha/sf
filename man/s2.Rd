@@ -25,9 +25,13 @@ s2_area(x)
 \arguments{
 \item{x}{object of class \code{sf}, or \code{sfc}}
 
+\item{to_p4s}{target CRS; defaults to "+proj=geocent +a=6371000 +b=6371000"}
+
 \item{...}{passed on to \link{st_transform}}
 
 \item{crs}{object of class \code{crs}}
+
+\item{radius}{numeric; Earth radius in m; defaults to 6371000.0}
 
 \item{y}{object of class \code{sf}, or \code{sfc}}
 }
