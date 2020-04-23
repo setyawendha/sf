@@ -3,16 +3,8 @@
 \name{as}
 \alias{as}
 \alias{coerce,Spatial,sf-method}
-<<<<<<< HEAD
-\alias{as}
-\alias{coerce,Spatial,sfc-method}
-\alias{as}
-\alias{coerce,sf,Spatial-method}
-\alias{as}
-=======
 \alias{coerce,Spatial,sfc-method}
 \alias{coerce,sf,Spatial-method}
->>>>>>> master
 \alias{coerce,sfc,Spatial-method}
 \alias{as_Spatial}
 \alias{coerce,crs,CRS-method}

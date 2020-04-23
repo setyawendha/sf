@@ -3,15 +3,10 @@
 \name{s2}
 \alias{s2}
 \alias{st_as_s2}
-\alias{s2}
 \alias{st_as_sfc.S2Polygon}
-\alias{s2}
 \alias{s2_intersection}
-\alias{s2}
 \alias{s2_intersects}
-\alias{s2}
 \alias{s2_centroid}
-\alias{s2}
 \alias{s2_area}
 \title{functions for spherical geometry, using s2 package}
 \usage{

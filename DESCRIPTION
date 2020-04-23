@@ -85,6 +85,7 @@ Suggests:
     RPostgres (>= 1.1.0),
     RPostgreSQL,
     RSQLite,
+    s2,
     sp (>= 1.2-4),
     spatstat,
     spatstat.utils,
@@ -147,3 +148,4 @@ Collate:
     'm_range.R'
     'shift_longitude.R'
     'make_grid.R'
+    's2.R'
