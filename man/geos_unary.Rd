@@ -3,35 +3,29 @@
 \name{geos_unary}
 \alias{geos_unary}
 \alias{st_buffer}
-\alias{geos_unary}
 \alias{st_boundary}
-\alias{geos_unary}
 \alias{st_convex_hull}
-\alias{geos_unary}
 \alias{st_simplify}
-\alias{geos_unary}
 \alias{st_triangulate}
-\alias{geos_unary}
 \alias{st_voronoi}
-\alias{geos_unary}
 \alias{st_polygonize}
-\alias{geos_unary}
 \alias{st_line_merge}
-\alias{geos_unary}
 \alias{st_centroid}
-\alias{geos_unary}
 \alias{st_point_on_surface}
-\alias{geos_unary}
+\alias{st_reverse}
 \alias{st_node}
-\alias{geos_unary}
-\alias{st_node.sfg}
-\alias{geos_unary}
-\alias{st_node.sfc}
-\alias{geos_unary}
 \alias{st_segmentize}
-\title{Geometric unary operations on (pairs of) simple feature geometry sets}
+\title{Geometric unary operations on simple feature geometry sets}
 \usage{
-st_buffer(x, dist, nQuadSegs = 30)
+st_buffer(
+  x,
+  dist,
+  nQuadSegs = 30,
+  endCapStyle = "ROUND",
+  joinStyle = "ROUND",
+  mitreLimit = 1,
+  singleSide = FALSE
+)
 
 st_boundary(x)
 
@@ -51,11 +45,9 @@ st_centroid(x, ..., of_largest_polygon = FALSE)
 
 st_point_on_surface(x)
 
+st_reverse(x)
+
 st_node(x)
-
-\method{st_node}{sfg}(x)
-
-\method{st_node}{sfc}(x)
 
 st_segmentize(x, dfMaxLength, ...)
 }
@@ -66,11 +58,20 @@ st_segmentize(x, dfMaxLength, ...)
 \code{dist} is a \code{units} object, it should be convertible to \code{arc_degree} if
 \code{x} has geographic coordinates, and to \code{st_crs(x)$units} otherwise}
 
-\item{nQuadSegs}{integer; number of segments per quadrant (fourth of a circle)}
+\item{nQuadSegs}{integer; number of segments per quadrant (fourth of a circle), for all or per-feature}
 
-\item{preserveTopology}{logical; carry out topology preserving simplification?}
+\item{endCapStyle}{character; style of line ends, one of 'ROUND', 'FLAT', 'SQUARE'}
 
-\item{dTolerance}{numeric; tolerance parameter}
+\item{joinStyle}{character; style of line joins, one of 'ROUND', 'MITRE', 'BEVEL'}
+
+\item{mitreLimit}{numeric; limit of extension for a join if \code{joinStyle} 'MITRE' is used (default 1.0, minimum 0.0)}
+
+\item{singleSide}{logical; if \code{TRUE}, single-sided buffers are returned for linear geometries, 
+in which case negative \code{dist} values give buffers on the right-hand side, positive on the left.}
+
+\item{preserveTopology}{logical; carry out topology preserving simplification? May be specified for each, or for all feature geometries. Note that topology is preserved only for single feature geometries, not for sets of them.}
+
+\item{dTolerance}{numeric; tolerance parameter, specified for all or for each feature geometry.}
 
 \item{bOnlyEdges}{logical; if TRUE, return lines, else return polygons}
 
@@ -80,31 +81,82 @@ st_segmentize(x, dfMaxLength, ...)
 
 \item{of_largest_polygon}{logical; for \code{st_centroid}: if \code{TRUE}, return centroid of the largest (sub)polygon of a \code{MULTIPOLYGON} rather than of the whole \code{MULTIPOLYGON}}
 
-\item{dfMaxLength}{maximum length of a line segment. If \code{x} has geographical coordinates (long/lat), \code{dfMaxLength} is either a numeric expressed in meter, or an object of class \code{units} with length units or unit \code{rad}, and segmentation takes place along the great circle, using \link[geosphere]{gcIntermediate}.}
+\item{dfMaxLength}{maximum length of a line segment. If \code{x} has geographical coordinates (long/lat), \code{dfMaxLength} is either a numeric expressed in meter, or an object of class \code{units} with length units \code{rad} or \code{degree}; segmentation in the long/lat case takes place along the great circle, using \link[lwgeom]{st_geod_segmentize}.}
 }
 \value{
-\code{st_buffer}, \code{st_boundary}, \code{st_convex_hull}, \code{st_simplify},
-\code{st_triangulate}, \code{st_voronoi}, \code{st_polygonize}, \code{st_line_merge},
-\code{st_centroid} and \code{st_segmentize} return an \link{sfc} or an \link{sf}
-object with the same number of geometries as \code{x}
+an object of the same class of \code{x}, with manipulated geometry.
 }
 \description{
-Geometric unary operations on (pairs of) simple feature geometry sets
+Geometric unary operations on simple feature geometries. These are all generics, with methods for \code{sfg}, \code{sfc} and \code{sf} objects, returning an object of the same class. All operations work on a per-feature basis, ignoring all other features.
 }
 \details{
-\code{st_triangulate} requires GEOS version 3.4 or above
+\code{st_buffer} computes a buffer around this geometry/each geometry. If any of \code{endCapStyle},
+\code{joinStyle}, or \code{mitreLimit} are set to non-default values ('ROUND', 'ROUND', 1.0 respectively) then
+the underlying 'buffer with style' GEOS function is used.
+See \href{https://postgis.net/docs/ST_Buffer.html}{postgis.net/docs/ST_Buffer.html} for details.
 
-\code{st_voronoi} requires GEOS version 3.5 or above
+\code{st_boundary} returns the boundary of a geometry
 
-in case of \code{st_polygonize}, \code{x} must be an object of class \code{LINESTRING} or \code{MULTILINESTRING}, or an \code{sfc} geometry list-column object containing these
+\code{st_convex_hull} creates the convex hull of a set of points
 
-in case of \code{st_line_merge}, \code{x} must be an object of class \code{MULTILINESTRING}, or an \code{sfc} geometry list-column object containing these
+\code{st_simplify} simplifies lines by removing vertices
+
+\code{st_triangulate} triangulates set of points (not constrained). \code{st_triangulate} requires GEOS version 3.4 or above
+
+\code{st_voronoi} creates voronoi tesselation. \code{st_voronoi} requires GEOS version 3.5 or above
+
+\code{st_polygonize} creates polygon from lines that form a closed ring. In case of \code{st_polygonize}, \code{x} must be an object of class \code{LINESTRING} or \code{MULTILINESTRING}, or an \code{sfc} geometry list-column object containing these
+
+\code{st_line_merge} merges lines. In case of \code{st_line_merge}, \code{x} must be an object of class \code{MULTILINESTRING}, or an \code{sfc} geometry list-column object containing these
+
+\code{st_centroid} gives the centroid of a geometry
 
 \code{st_point_on_surface} returns a point guaranteed to be on the (multi)surface.
 
-\code{st_node} add nodes to linear geometries at intersections without node
+\code{st_reverse} reverses the nodes in a line
+
+\code{st_node} adds nodes to linear geometries at intersections without a node, and only works on individual linear geometries
+
+\code{st_segmentize} adds points to straight lines
 }
 \examples{
+
+## st_buffer, style options (taken from rgeos gBuffer)
+l1 = st_as_sfc("LINESTRING(0 0,1 5,4 5,5 2,8 2,9 4,4 6.5)")
+op = par(mfrow=c(2,3))
+plot(st_buffer(l1, dist = 1, endCapStyle="ROUND"), reset = FALSE, main = "endCapStyle: ROUND")
+plot(l1,col='blue',add=TRUE)
+plot(st_buffer(l1, dist = 1, endCapStyle="FLAT"), reset = FALSE, main = "endCapStyle: FLAT")
+plot(l1,col='blue',add=TRUE)
+plot(st_buffer(l1, dist = 1, endCapStyle="SQUARE"), reset = FALSE, main = "endCapStyle: SQUARE")
+plot(l1,col='blue',add=TRUE)
+plot(st_buffer(l1, dist = 1, nQuadSegs=1), reset = FALSE, main = "nQuadSegs: 1")
+plot(l1,col='blue',add=TRUE)
+plot(st_buffer(l1, dist = 1, nQuadSegs=2), reset = FALSE, main = "nQuadSegs: 2")
+plot(l1,col='blue',add=TRUE)
+plot(st_buffer(l1, dist = 1, nQuadSegs= 5), reset = FALSE, main = "nQuadSegs: 5")
+plot(l1,col='blue',add=TRUE)
+par(op)
+
+
+l2 = st_as_sfc("LINESTRING(0 0,1 5,3 2)")
+op = par(mfrow = c(2, 3))
+plot(st_buffer(l2, dist = 1, joinStyle="ROUND"), reset = FALSE, main = "joinStyle: ROUND")
+plot(l2, col = 'blue', add = TRUE)
+plot(st_buffer(l2, dist = 1, joinStyle="MITRE"), reset = FALSE, main = "joinStyle: MITRE")
+plot(l2, col= 'blue', add = TRUE)
+plot(st_buffer(l2, dist = 1, joinStyle="BEVEL"), reset = FALSE, main = "joinStyle: BEVEL")
+plot(l2, col= 'blue', add=TRUE)
+plot(st_buffer(l2, dist = 1, joinStyle="MITRE" , mitreLimit=0.5), reset = FALSE,
+   main = "mitreLimit: 0.5")
+plot(l2, col = 'blue', add = TRUE)
+plot(st_buffer(l2, dist = 1, joinStyle="MITRE",mitreLimit=1), reset = FALSE,
+   main = "mitreLimit: 1")
+plot(l2, col = 'blue', add = TRUE)
+plot(st_buffer(l2, dist = 1, joinStyle="MITRE",mitreLimit=3), reset = FALSE,
+   main = "mitreLimit: 3")
+plot(l2, col = 'blue', add = TRUE)
+par(op)
 nc = st_read(system.file("shape/nc.shp", package="sf"))
 plot(st_convex_hull(nc))
 plot(nc, border = grey(.5))
@@ -118,6 +170,18 @@ if (sf_extSoftVersion()["GEOS"] >= "3.5.0") {
  plot(x, add = TRUE, col = 'red', cex=2, pch=16)
  plot(st_intersection(st_cast(v), box)) # clip to smaller box
  plot(x, add = TRUE, col = 'red', cex=2, pch=16)
+ # matching Voronoi polygons to data points:
+ # https://github.com/r-spatial/sf/issues/1030
+ # generate 50 random unif points:
+ n = 100
+ pts = st_as_sf(data.frame(matrix(runif(n), , 2), id = 1:(n/2)), coords = c("X1", "X2"))
+ # compute Voronoi polygons:
+ pols = st_collection_extract(st_voronoi(do.call(c, st_geometry(pts))))
+ # match them to points:
+ pts$pols = pols[unlist(st_intersects(pts, pols))]
+ plot(pts["id"], pch = 16) # ID is color
+ plot(st_set_geometry(pts, "pols")["id"], xlim = c(0,1), ylim = c(0,1), reset = FALSE)
+ plot(st_geometry(pts), add = TRUE)
 }
 mls = st_multilinestring(list(matrix(c(0,0,0,1,1,1,0,0),,2,byrow=TRUE)))
 st_polygonize(st_sfc(mls))
@@ -131,8 +195,12 @@ plot(st_centroid(mp), add = TRUE, col = 'red') # centroid of combined geometry
 plot(st_centroid(mp, of_largest_polygon = TRUE), add = TRUE, col = 'blue', pch = 3)
 plot(nc, axes = TRUE)
 plot(st_point_on_surface(nc), add = TRUE, pch = 3)
-l = st_linestring(rbind(c(0,0), c(1,1), c(0,1), c(1,0), c(0,0)))
+if (sf_extSoftVersion()["GEOS"] >= "3.7.0") {
+  st_reverse(st_linestring(rbind(c(1,1), c(2,2), c(3,3))))
+}
+(l = st_linestring(rbind(c(0,0), c(1,1), c(0,1), c(1,0), c(0,0))))
 st_polygonize(st_node(l))
+st_node(st_multilinestring(list(rbind(c(0,0), c(1,1), c(0,1), c(1,0), c(0,0)))))
 sf = st_sf(a=1, geom=st_sfc(st_linestring(rbind(c(0,0),c(1,1)))), crs = 4326)
 seg = st_segmentize(sf, units::set_units(100, km))
 seg = st_segmentize(sf, units::set_units(0.01, rad))

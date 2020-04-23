@@ -24,7 +24,9 @@ which_sfc_col = function(cls) {
 		MULTILINESTRING = 2,
 		POLYGON = 2,
 		MULTIPOLYGON = 3,
+		MULTICURVE = 3,
 		GEOMETRYCOLLECTION = 4,
+		MULTISURFACE = 4,
 		GEOMETRY = 5,
 		stop(paste("st_cast for", cls, "not supported"))
 	)
@@ -49,9 +51,10 @@ close_polygon_or_multipolygon = function(x, to) {
 	to_col = which_sfc_col(to)
 	close_mat = function(m) {
 		if (any(m[1,] != m[nrow(m),]))
-			rbind(m, m[1,])
-		else
-			m
+			m = rbind(m, m[1,])
+		if (nrow(m) < 4)
+			stop("polygons require at least 4 points")
+		m
 	}
 	add_attributes(
 		if (to_col == 2)
@@ -96,30 +99,36 @@ get_lengths = function(x) {
 #' Features that can't be cast to a single  MULTI* geometry are return as a
 #' GEOMETRYCOLLECTION
 st_cast_sfc_default = function(x) {
-  if (!identical(unique(vapply(x, function(w) class(w)[3L], "")), "sfg"))
-    stop("list item(s) not of class sfg") # sanity check
+	if (!identical(unique(vapply(x, function(w) class(w)[3L], "")), "sfg"))
+		stop("list item(s) not of class sfg") # sanity check
 
-  a <- attributes(x)
-  ids = NULL
-  cls = unique(vapply(x, function(x) class(x)[2L], ""))
-  if (length(cls) > 1) {
-    if (all(cls %in% c("POINT", "MULTIPOINT"))) {
-      x <- lapply(x, function(x) if (inherits(x, "POINT")) POINT2MULTIPOINT(x) else x)
-      class(x) <- c("sfc_MULTIPOINT", "sfc")
-    } else if (all(cls %in% c("LINESTRING", "MULTILINESTRING"))) {
-      x <- lapply(x, function(x) if (inherits(x, "LINESTRING")) LINESTRING2MULTILINESTRING(x) else x)
-      class(x) <- c("sfc_MULTILINESTRING", "sfc")
-    } else if (all(cls %in% c("POLYGON", "MULTIPOLYGON"))) {
-      x <- lapply(x, function(x) if (inherits(x, "POLYGON")) POLYGON2MULTIPOLYGON(x) else x)
-      class(x) <- c("sfc_MULTIPOLYGON", "sfc")
-    }
-  } else if (cls == "GEOMETRYCOLLECTION") {
-    ids = get_lengths(x)
-    x <- do.call(st_sfc, unlist(x, recursive = FALSE))
-  }
-  attributes(x) <- a
-  structure(st_sfc(x), ids = ids)
+	a <- attributes(x)
+	ids = NULL
+	cls = unique(vapply(x, function(x) class(x)[2L], ""))
+	if (length(cls) > 1) {
+		if (all(cls %in% c("POINT", "MULTIPOINT"))) {
+			x <- lapply(x, function(x) if (inherits(x, "POINT")) POINT2MULTIPOINT(x) else x)
+			class(x) <- c("sfc_MULTIPOINT", "sfc")
+		} else if (all(cls %in% c("LINESTRING", "MULTILINESTRING"))) {
+			x <- lapply(x, function(x) if (inherits(x, "LINESTRING")) LINESTRING2MULTILINESTRING(x) else x)
+			class(x) <- c("sfc_MULTILINESTRING", "sfc")
+		} else if (all(cls %in% c("POLYGON", "MULTIPOLYGON"))) {
+			x <- lapply(x, function(x) if (inherits(x, "POLYGON")) POLYGON2MULTIPOLYGON(x) else x)
+			class(x) <- c("sfc_MULTIPOLYGON", "sfc")
+		}
+	} else if (cls == "GEOMETRYCOLLECTION") {
+		ids = get_lengths(x)
+		x <- do.call(st_sfc, unlist(x, recursive = FALSE))
+	}
+	attributes(x) <- a
+	structure(st_sfc(x), ids = ids)
 }
+
+copy_sfc_attributes_from = function(x, ret) {
+	structure(ret, precision = attr(x, "precision"),
+		bbox = attr(x, "bbox"), crs = attr(x, "crs"), n_empty = attr(x, "n_empty"))
+}
+
 
 #' @name st_cast
 #' @param ids integer vector, denoting how geometries should be grouped (default: no grouping)
@@ -146,26 +155,42 @@ st_cast.sfc = function(x, to, ..., ids = seq_along(x), group_or_split = TRUE) {
 	else if (abs(from_col - to_col) > 1) {
 		if (to == "POINT")
 			st_cast(st_cast(x, "MULTIPOINT"), "POINT")
-		else if (to %in% c("MULTIPOINT", "LINESTRING")) {
+		else if (to == "MULTIPOINT") {
 			ret = lapply(x, function(y) structure(as.matrix(y), class = c(class(y)[1], to, "sfg")))
-			attributes(ret) = attributes(x)
+			ret = copy_sfc_attributes_from(x, ret)
 			reclass(ret, to, FALSE)
 		} else
-			stop("use smaller steps for st_cast, or first convert to MULTIPOINT or LINESTRING")
+			#st_cast(st_cast(x, "MULTILINESTRING"), to)
+			stop("use smaller steps for st_cast; first cast to MULTILINESTRING or POLYGON?")
 	} else if (from_col < to_col) { # "horizontal", to the right: group
 		ret = if (from_col == 0)
 			lapply(unname(split(x, ids)), function(y) structure(do.call(rbind, y), class = class(x[[1]])))
 		else
 			lapply(unname(split(x, ids)), function(y) structure(y, class = class(x[[1]])))
-		attributes(ret) = attributes(x)
+		ret = copy_sfc_attributes_from(x, ret)
 		reclass(ret, to, need_close(to))
+	} else if (from_col == 3 && to == "MULTILINESTRING") {
+		if (from_cls == "MULTICURVE") {
+			ret = lapply(x, st_cast, to = "MULTILINESTRING")
+		} else {
+			ret = lapply(x, unlist, recursive = FALSE) # unlist one level deeper; one MULTIPOLYGON -> one MULTILINESTRING
+			if (length(ret))
+				class(ret[[1]]) = class(x[[1]]) # got dropped
+		}
+		ret = copy_sfc_attributes_from(x, ret)
+		structure(reclass(ret, to, FALSE))
 	} else { # "horizontal", to the left: split
-		ret = if (from_col == 1) # to POINT
+		ret = if (from_col == 1) # LINESTRING or MULTIPOINT to POINT
 				unlist(lapply(x, function(m) lapply(seq_len(nrow(m)), function(i) m[i,])), recursive = FALSE)
-			else 
-				unlist(x, recursive = FALSE)
+			else {
+				if (to_col == 0 && from_cls == "POLYGON") # POLYGON -> POINT
+					lapply(x, function(y) do.call(rbind, y))
+				else
+					unlist(x, recursive = FALSE)
+			}
 		ret = lapply(ret, function(y) structure(y, class = class(x[[1]]))) # will be reset by reclass()
-		attributes(ret) = attributes(x)
+		ret = copy_sfc_attributes_from(x, ret)
+		# EJP: FIXME:
 		structure(reclass(ret, to, need_close(to)), ids = get_lengths(x))
 	}
 }
@@ -180,18 +205,21 @@ st_cast.sf = function(x, to, ..., warn = TRUE, do_split = TRUE) {
 	crs = st_crs(x)
 	agr = st_agr(x)
 	all_const = all_constant(x)
+	sf_column = attr(x, "sf_column") # keep name
 	st_geometry(x) = NULL
+	# class(x) = setdiff(class(x), "sf")
 	ids = attr(geom, "ids")          # e.g. 3 2 4
 	if (!is.null(ids)) { # split:
-		if (warn && !all_const)
+		if (warn && ! all_const)
 			warning("repeating attributes for all sub-geometries for which they may not be constant")
 		reps = rep(seq_len(length(ids)), ids) # 1 1 1 2 2 3 3 3 3 etc
 		agr[agr == "identity"] = "constant" # since we splitted
-		x = x[reps, , drop = FALSE]
+		x = x[reps,, drop = FALSE]
 		stopifnot(nrow(x) == length(geom))
 	}
 	attr(geom, "ids") = NULL # remove
-	st_geometry(x) = geom
+	x[[sf_column]] = geom
+	st_geometry(x) = sf_column
 	st_agr(x) = agr
 	x
 }

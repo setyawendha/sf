@@ -1,6 +1,5 @@
 # dim: what does the third dimension, if present, refer to? (XYZ or XYM)
 getClassDim = function(x, d, dim = "XYZ", type) {
-	stopifnot(d > 1 && d < 5)
 	type = toupper(type)
 	if (d == 2)
 		c("XY", type, "sfg")
@@ -12,11 +11,12 @@ getClassDim = function(x, d, dim = "XYZ", type) {
 	else stop(paste(d, "is an illegal number of columns for a", type))
 }
 
-is_numeric_matrix = function(x)
-	stopifnot(is.numeric(x) && is.matrix(x))
+valid_numeric_matrix = function(x) {
+	stopifnot(is.numeric(x), is.matrix(x), !anyNA(x))
+}
 
 Mtrx = function(x, dim = "XYZ", type) {
-	is_numeric_matrix(x)
+	valid_numeric_matrix(x)
 	structure(x, class = getClassDim(x, ncol(x), dim, type))
 }
 
@@ -26,14 +26,17 @@ MtrxSet = function(x, dim = "XYZ", type, needClosed = FALSE) {
 	if (length(x) > 0) { # list()
 		nc = unique(vapply(x, ncol, 0L))
 		if (length(nc) != 1)
-			stop("matrices having unequal number of columns")
-		lapply(x, is_numeric_matrix)
-		NotClosed = function(y) any(head(y, 1) != tail(y, 1))
+			stop("matrices have unequal numbers of columns")
+		lapply(x, valid_numeric_matrix)
+		NotClosed = function(y) any(y[1, ] != y[nrow(y), ])
 		if (needClosed && any(vapply(x, NotClosed, TRUE)))
 			stop("polygons not (all) closed")
-		structure(x, class = getClassDim(x, nc, dim, type))
-	} else
-		structure(x, class = getClassDim(x, nchar(dim), dim, type))
+		class(x) = getClassDim(x, nc, dim, type)
+		return(x)
+	} else {
+		class(x) = getClassDim(x, nchar(dim), dim, type)
+		return(x)
+	}
 }
 
 # creates object of class c(dim, type, "sfg") from list x, d, possibly checking rings are closed
@@ -42,20 +45,33 @@ MtrxSetSet = function(x, dim = "XYZ", type, needClosed = FALSE) {
 	if (length(x)) {
 		nc = unique(unlist(lapply(x, function(y) vapply(y, ncol, 0L))))
 		if (length(nc) != 1)
-			stop("matrices having unequal number of columns")
-		lapply(x, function(y) lapply(y, is_numeric_matrix))
-		NotClosed = function(y) any(head(y, 1) != tail(y, 1))
+			stop("matrices have unequal numbers of columns")
+		lapply(x, function(y) lapply(y, valid_numeric_matrix))
+		NotClosed = function(y) any(y[1, ] != y[nrow(y), ])
 		if (needClosed && any(unlist(lapply(x, function(y) vapply(y, NotClosed, TRUE)))))
 			stop("polygons not (all) closed")
-		structure(x, class = getClassDim(x, nc, dim, type))
-	} else
-		structure(x, class = getClassDim(x, nchar(dim), dim, type))
+		class(x) = getClassDim(x, nc, dim, type)
+		return(x)
+	} else {
+		class(x) = getClassDim(x, nchar(dim), dim, type)
+		return(x)
+	}
 }
 
 #return "XY", "XYZ", "XYM", or "XYZM"
 Dimension = function(x) {
 	stopifnot(inherits(x, "sfg"))
 	class(x)[1]
+}
+
+## internal function to get a list of sfg POINT for st_as_sf(, coords = ...)
+## src/sfg.cpp
+## https://github.com/r-spatial/sf/issues/700
+points_rcpp <- function(pts, gdim = "XY", ...) {
+	stopifnot(gdim %in% c("XY", "XYZ", "XYZM", "XYM"))
+	if (dim(pts)[2L] == 2L && nchar(gdim) > 2L) gdim = "XY"
+	stopifnot(dim(pts)[2] == nchar(gdim))
+	points_cpp(pts, gdim)
 }
 
 #' Create simple feature from a numeric vector, matrix or list
@@ -135,9 +151,7 @@ st_linestring = function(x = matrix(numeric(0), 0, 2), dim = "XYZ") Mtrx(x, dim,
 #' @name st
 #' @export
 st_polygon = function(x = list(), dim = if(length(x)) "XYZ" else "XY") {
-	if (identical(x, 1))
-		st_polygon(list(rbind(c(0,0),c(1,0),c(1,1),c(0,1),c(0,0))))
-	else MtrxSet(x, dim, type = "POLYGON", needClosed = TRUE)
+	MtrxSet(x, dim, type = "POLYGON", needClosed = TRUE)
 }
 #' @name st
 #' @export
@@ -176,16 +190,19 @@ LINESTRING2MULTILINESTRING = function(x, dim = "XYZ") {
 	st_multilinestring(list(unclass(x)), dim = dim)
 }
 POLYGON2MULTIPOLYGON = function(x, dim = "XYZ") {
+	if (st_is_empty(x)) {
+		return(st_multipolygon(dim = class(x)[1]))
+	}
 	if (ncol(x[[1]]) == 3) # disambiguate Z/M:
 		dim = class(x)[1]
 	st_multipolygon(list(unclass(x)), dim = dim)
 }
 
 #' @name st
-#' @param digits integer; number of characters to be printed (max 30; 0 means print everything)
+#' @param width integer; number of characters to be printed (max 30; 0 means print everything)
 #' @export
-print.sfg = function(x, ..., digits = 0) { # avoids having to write print methods for 68 classes:
-	f = format(x, ..., digits = digits)
+print.sfg = function(x, ..., width = 0) { # avoids having to write print methods for 68 classes:
+	f = format(x, ..., width = width)
 	message(f)
 	invisible(f)
 }
@@ -197,16 +214,25 @@ head.sfg = function(x, n = 10L, ...) {
 	structure(head(unclass(x), n = n, ...), class = class(x))
 }
 
+#
+get_start = function(x, n = 30) {
+	if (is.list(x)) # recurse into first element:
+		structure(lapply(x, get_start, n = n), class = class(x))
+	else # matrix:
+		head(x, round(n/3))
+}
+
+
 #' @name st
 #' @export
-format.sfg = function(x, ..., digits = 30) {
-	if (is.null(digits))
-		digits = 30
-	if (object.size(x) > 1000)
-		x = head(x, 10)
-	pr = st_as_text(x)
-	if (digits > 0 && nchar(pr) > digits)
-		paste0(substr(pr, 1, digits - 3), "...")
+format.sfg = function(x, ..., width = 30) {
+	if (is.null(width))
+		width = 30
+	if (object.size(x) > 1000 && width > 0)
+		x = get_start(x, n = width)
+	pr = st_as_text(x, ...)
+	if (width > 0 && nchar(pr) > width)
+		paste0(substr(pr, 1, width - 3), "...")
 	else
 		pr
 }
@@ -231,7 +257,7 @@ format.sfg = function(x, ..., digits = 30) {
 #' c(st_geometrycollection(list(st_point(1:2), st_linestring(matrix(1:6,3)))),
 #'   st_multilinestring(list(matrix(11:16,3))), st_point(5:6),
 #'   st_geometrycollection(list(st_point(10:11))))
-#' @details When \code{flatten=TRUE}, this method may merge points into a multipoint structure, and may not preserve order, and hence cannot be reverted. When given fish, it returns fish soup. 
+#' @details When \code{flatten=TRUE}, this method may merge points into a multipoint structure, and may not preserve order, and hence cannot be reverted. When given fish, it returns fish soup.
 c.sfg = function(..., recursive = FALSE, flatten = TRUE) {
 
 	stopifnot(! recursive)

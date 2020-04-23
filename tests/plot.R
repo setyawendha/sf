@@ -8,7 +8,7 @@ l3 = st_linestring(matrix(runif(6)-0.5,,2))
 s = st_sf(a=2:4, b=st_sfc(l1,l2,l3))
 plot(s, col = s$a, axes = FALSE)
 plot(s, col = s$a)
-attr(s$b, "proj4string") = sp::CRS("+init=epsg:4326")@projargs
+attr(s$b, "proj4string") = sp::CRS("+proj=longlat +ellps=WGS84 +no_defs")@projargs
 plot(s, col = s$a, axes = TRUE)
 plot(s, col = s$a, lty = s$a, lwd = s$a, pch = s$a, type = 'b')
 l4 = st_linestring(matrix(runif(6),,2))
@@ -66,12 +66,17 @@ nc = st_read(system.file("shape/nc.shp", package="sf"), quiet = TRUE)
 plot(nc)
 plot(nc, axes = TRUE)
 plot(nc, col="lightgrey") 
+plot(st_centroid(nc), add = TRUE, col = 1)
 nc %>% 
   select(geometry) %>% 
   plot()
 
+nc$f = cut(nc[[1]], 5)
+plot(nc["f"], key.pos = 1)
+plot(nc[1],   key.pos = 1)
+
 # test background map plotting:
-data(bgmap)
+load("bgmap.rda")
 merc = st_crs(3857)
 WGS84 = st_crs(4326)
 nc = st_transform(nc, WGS84)
@@ -88,7 +93,23 @@ par(mar = c(0,0,1,0))
 plot(st_transform(nc, merc), bgMap = g)
 
 m = st_make_grid()
-m = st_segmentize(m, 2e5)
+st_crs(m) = NA_crs_
+m = st_segmentize(m, 2)
+st_crs(m) = 4326
 plot(m, axes = TRUE)
 g = st_transform(m, st_crs("+proj=ortho +lat_0=30 +lon_0=45"), check = TRUE)
 plot(g, axes = TRUE)
+
+nc[[1]] = NA
+nc[[10]] = 1
+plot(nc, pal = rainbow, nbreaks = 3)
+plot(nc, pal = rainbow, breaks = "jenks", nbreaks = 3)
+plot(nc, pal = rainbow, breaks = (0:10)/3)
+
+# logz:
+nc$e = 10^(nc$SID74)
+plot(nc["e"], logz = TRUE)
+
+# shared key:
+plot(nc[c("SID74", "SID79")], key.pos = -1)
+plot(nc[c("BIR74", "BIR79")], key.pos = 1, logz=TRUE)

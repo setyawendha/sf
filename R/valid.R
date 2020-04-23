@@ -28,19 +28,21 @@ st_is_valid = function(x, NA_on_exception = TRUE, reason = FALSE) {
 	}
 }
 
+
+#' Make an invalid geometry valid
+#'
 #' Make an invalid geometry valid
 #' @name valid
 #' @param x object of class \code{sfg}, \code{sfg} or \code{sf}
 #' @return Object of the same class as \code{x}
-#' @details \code{st_make_valid} uses the \code{lwgeom_makevalid} method also used by the PostGIS command \code{ST_makevalid}. It is only available if the package was linked against liblwgeom, which is currently not the case for the binary CRAN distributions; see the package source code repository for instructions how to install liblwgeom. The example below shows how to run-time check the availability of liblwgeom.
+#' @details \code{st_make_valid} uses the \code{lwgeom_makevalid} method also used by the PostGIS command \code{ST_makevalid} if the GEOS version linked to is smaller than 3.8.0, and otherwise the version shipped in GEOS.
 #' @examples
+#' library(sf)
 #' x = st_sfc(st_polygon(list(rbind(c(0,0),c(0.5,0),c(0.5,0.5),c(0.5,0),c(1,0),c(1,1),c(0,1),c(0,0)))))
-#' if (!is.na(sf_extSoftVersion()["lwgeom"])) {
-#'   suppressWarnings(st_is_valid(x))
-#'   y = st_make_valid(x)
-#'   st_is_valid(y)
-#'   y %>% st_cast()
-#' }
+#' suppressWarnings(st_is_valid(x))
+#' y = st_make_valid(x)
+#' st_is_valid(y)
+#' y %>% st_cast()
 #' @export
 st_make_valid = function(x) UseMethod("st_make_valid")
 
@@ -51,7 +53,14 @@ st_make_valid.sfg = function(x) {
 
 #' @export
 st_make_valid.sfc = function(x) {
-	st_sfc(CPL_make_valid(x), crs = st_crs(x))
+	crs = st_crs(x)
+	x = if (sf_extSoftVersion()["GEOS"] < "3.8.0") {
+			if (!requireNamespace("lwgeom", quietly = TRUE))
+				stop("lwgeom required: install that first") # nocov
+			lwgeom::lwgeom_make_valid(x)
+		} else
+			CPL_geos_make_valid(x) # nocov
+	st_sfc(x, crs = crs)
 }
 
 #' @export

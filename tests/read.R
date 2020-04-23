@@ -48,7 +48,15 @@ try(st_write(x, c("foo", "bar")))
 try(st_write(x, "foo", driver = "foo"))
 if (Sys.getenv("USER") == "travis") {
 	try(st_write(x, "/x", driver = "ESRI Shapefile"))
+	st_write(x, "xxx.gpkg")
+	st_write(x, "xxx.gpkg", append = TRUE, quiet = FALSE) # appends to layer
+	y <- st_sf(b = 1:2, geom = st_sfc(st_point(0:1), st_multipoint(matrix(1:4,2,2))))
+	try(st_write(y, "xxx.gpkg"))
 }
+
+geom = st_sfc(st_point(0:1), st_multipoint(matrix(1:4,2,2)))
+st_write(geom, "geom.gpkg")
+st_write(geom, "geom1.gpkg", layer = "foo")
 
 df <- data.frame(
     a = c(0, 1, NA, -Inf, Inf),
@@ -72,12 +80,16 @@ if ("SQLite" %in% st_drivers()$name && require(RSQLite)) {
 	m = dbReadTable(dbcon, "meuse.sqlite")
 	m$GEOMETRY = st_as_sfc(m$GEOMETRY, spatialite = FALSE) # ISO wkb
 	print(st_sf(m), n = 3)
+	# or:
+	(s = st_read(dbcon, "meuse.sqlite"))[1:3,]
+	dbDisconnect(dbcon)
 
 	db = system.file("sqlite/nc.sqlite", package = "sf")
 	dbcon <- dbConnect(dbDriver("SQLite"), db)
 	m = dbReadTable(dbcon, "nc.sqlite")
 	m$GEOMETRY = st_as_sfc(m$GEOMETRY, spatialite = FALSE) # ISO wkb
 	print(st_sf(m), n = 3)
+	dbDisconnect(dbcon)
 
 	db = system.file("sqlite/b.sqlite", package = "sf") # has an INT8 field
 	b = st_read(db, quiet = TRUE)
@@ -108,8 +120,26 @@ identical(st_read(quiet = TRUE, csv, options = "AUTODETECT_TYPE=Yes")$Int32[3], 
 
 if ("GML" %in% st_drivers()$name) {
   gml = system.file("gml/fmi_test.gml", package = "sf")
-  print(st_read(gml, quiet = TRUE), n = 0)
+  print(dim(st_read(gml, quiet = TRUE)))
   gml = system.file("gml/20170930_OB_530964_UKSH.xml.gz", package = "sf")
-  print(st_read(gml, layer = "Parcely"), n = 0)
-  print(st_read(gml, layer = "Parcely", int64_as_string=TRUE), n = 0)
+  print(dim(st_read(gml, layer = "Parcely", quiet = TRUE)))
+  print(dim(st_read(gml, layer = "Parcely", int64_as_string=TRUE, quiet = TRUE)))
 }
+
+# logical:
+if ("GPKG" %in% st_drivers()$name) {
+	tst = st_read(system.file("gpkg/nc.gpkg", package="sf"), quiet = TRUE) # default layer name
+	tst$bool = tst$NWBIR79 > 800 # logical
+	tst$bool[1:3] = NA
+	st_write(tst, "tst__.gpkg")
+	tst2 = st_read("tst__.gpkg")
+	print(identical(tst$bool, tst2$bool))
+}
+
+# spatial filter:
+nc = read_sf(system.file("gpkg/nc.gpkg", package="sf"))
+wkt = st_as_text(st_geometry(nc[1,]))
+wkt
+nc_filtered = read_sf(system.file("gpkg/nc.gpkg", package="sf"), wkt_filter = wkt)
+try(read_sf(system.file("gpkg/nc.gpkg", package="sf"), wkt_filter = "wrong"))
+nc_filtered$NAME

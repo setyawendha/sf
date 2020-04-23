@@ -1,6 +1,6 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -108,8 +108,7 @@ Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 First 5 geometries:
 POINT EMPTY
 MULTIPOINT EMPTY
@@ -128,8 +127,8 @@ Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XYZ
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+z_range:        zmin: NA zmax: NA
+CRS:            NA
 First 5 geometries:
 POINT Z EMPTY
 MULTIPOINT Z EMPTY
@@ -148,8 +147,8 @@ Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XYM
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+m_range:        zmin: NA zmax: NA
+CRS:            NA
 First 5 geometries:
 POINT M EMPTY
 MULTIPOINT M EMPTY
@@ -168,8 +167,9 @@ Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XYZM
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+z_range:        zmin: NA zmax: NA
+m_range:        mmin: NA mmax: NA
+CRS:            NA
 First 5 geometries:
 POINT ZM EMPTY
 MULTIPOINT ZM EMPTY
@@ -178,12 +178,11 @@ MULTILINESTRING ZM EMPTY
 POLYGON ZM EMPTY
 > 
 > st_as_sfc(st_as_binary(e1, pureR = TRUE))
-Geometry set for 7 features  (with 6 geometries empty)
+Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 First 5 geometries:
 POINT EMPTY
 MULTIPOINT EMPTY
@@ -191,12 +190,11 @@ LINESTRING EMPTY
 MULTILINESTRING EMPTY
 POLYGON EMPTY
 > st_as_sfc(st_as_binary(e1, pureR = FALSE))
-Geometry set for 7 features  (with 6 geometries empty)
+Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 First 5 geometries:
 POINT EMPTY
 MULTIPOINT EMPTY
@@ -204,12 +202,12 @@ LINESTRING EMPTY
 MULTILINESTRING EMPTY
 POLYGON EMPTY
 > st_as_sfc(st_as_binary(e2, pureR = FALSE))
-Geometry set for 7 features  (with 6 geometries empty)
+Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XYZ
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+z_range:        zmin: NA zmax: NA
+CRS:            NA
 First 5 geometries:
 POINT Z EMPTY
 MULTIPOINT Z EMPTY
@@ -217,12 +215,12 @@ LINESTRING Z EMPTY
 MULTILINESTRING Z EMPTY
 POLYGON Z EMPTY
 > st_as_sfc(st_as_binary(e3, pureR = FALSE))
-Geometry set for 7 features  (with 6 geometries empty)
+Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XYM
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+m_range:        zmin: NA zmax: NA
+CRS:            NA
 First 5 geometries:
 POINT M EMPTY
 MULTIPOINT M EMPTY
@@ -230,12 +228,13 @@ LINESTRING M EMPTY
 MULTILINESTRING M EMPTY
 POLYGON M EMPTY
 > st_as_sfc(st_as_binary(e4, pureR = FALSE))
-Geometry set for 7 features  (with 6 geometries empty)
+Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XYZM
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+z_range:        zmin: NA zmax: NA
+m_range:        mmin: NA mmax: NA
+CRS:            NA
 First 5 geometries:
 POINT ZM EMPTY
 MULTIPOINT ZM EMPTY
@@ -243,12 +242,11 @@ LINESTRING ZM EMPTY
 MULTILINESTRING ZM EMPTY
 POLYGON ZM EMPTY
 > st_as_sfc(st_as_binary(e1, pureR = FALSE))
-Geometry set for 7 features  (with 6 geometries empty)
+Geometry set for 7 features  (with 7 geometries empty)
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 First 5 geometries:
 POINT EMPTY
 MULTIPOINT EMPTY
@@ -271,25 +269,20 @@ POLYGON EMPTY
 [2,] FALSE FALSE
 > 
 > # write & read:
-> x = st_sf(a = 2:1, geometry = st_sfc(st_linestring(), st_linestring(matrix(1:4,2))))
-> write_sf(x, "empty.shp")
-> y = st_read("empty.shp", quiet = TRUE)
+> x = st_sf(a = 2:1, geom = structure(st_sfc(st_linestring(), st_linestring(matrix(1:4,2)))))
+> write_sf(x, "empty.gpkg")
+> y = st_read("empty.gpkg", quiet = TRUE)
 > all.equal(x, y)
 [1] TRUE
 > 
 > # https://github.com/edzer/sfr/issues/398 :
 > pt = st_sfc(st_point(c(0,92)), crs = 4267)
 > robin_crs <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
-> india_crs <- "+init=epsg:24383"  # India-centered Lambert conformal conic projection
-> st_transform(st_transform(pt, robin_crs), india_crs)
-Geometry set for 1 feature 
-geometry type:  POINT
-dimension:      XY
-bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    24383
-proj4string:    +proj=lcc +lat_1=12 +lat_0=12 +lon_0=80 +k_0=0.99878641 +x_0=2743195.5 +y_0=914398.5 +a=6377299.151 +b=6356098.145120132 +towgs84=295,736,257,0,0,0,0 +units=m +no_defs
+> # india_crs <- "+init=epsg:24383"  # India-centered Lambert conformal conic projection
+> india_crs <- "+proj=lcc +lat_1=12 +lat_0=12 +lon_0=80 +k_0=0.99878641 +x_0=2743195.5 +y_0=914398.5 +a=6377299.151 +b=6356098.145120132 +towgs84=295,736,257,0,0,0,0 +units=m +no_defs"
+> st_transform(st_transform(pt, robin_crs), india_crs)[[1]]
 POINT EMPTY
 > 
 > proc.time()
    user  system elapsed 
-  0.716   0.280   0.702 
+  0.413   0.034   0.437 

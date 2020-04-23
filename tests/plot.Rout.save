@@ -1,6 +1,6 @@
 
-R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -36,7 +36,7 @@ The following objects are masked from 'package:base':
 > s = st_sf(a=2:4, b=st_sfc(l1,l2,l3))
 > plot(s, col = s$a, axes = FALSE)
 > plot(s, col = s$a)
-> attr(s$b, "proj4string") = sp::CRS("+init=epsg:4326")@projargs
+> attr(s$b, "proj4string") = sp::CRS("+proj=longlat +ellps=WGS84 +no_defs")@projargs
 > plot(s, col = s$a, axes = TRUE)
 > plot(s, col = s$a, lty = s$a, lwd = s$a, pch = s$a, type = 'b')
 > l4 = st_linestring(matrix(runif(6),,2))
@@ -100,12 +100,24 @@ plotting the first 10 out of 14 attributes; use max.plot = 14 to plot all
 > plot(nc, col="lightgrey") 
 Warning message:
 plotting the first 10 out of 14 attributes; use max.plot = 14 to plot all 
+> plot(st_centroid(nc), add = TRUE, col = 1)
+Warning messages:
+1: In st_centroid.sf(nc) :
+  st_centroid assumes attributes are constant over geometries of x
+2: In st_centroid.sfc(st_geometry(x), of_largest_polygon = of_largest_polygon) :
+  st_centroid does not give correct centroids for longitude/latitude data
+3: In plot.sf(st_centroid(nc), add = TRUE, col = 1) :
+  ignoring all but the first attribute
 > nc %>% 
 +   select(geometry) %>% 
 +   plot()
 > 
+> nc$f = cut(nc[[1]], 5)
+> plot(nc["f"], key.pos = 1)
+> plot(nc[1],   key.pos = 1)
+> 
 > # test background map plotting:
-> data(bgmap)
+> load("bgmap.rda")
 > merc = st_crs(3857)
 > WGS84 = st_crs(4326)
 > nc = st_transform(nc, WGS84)
@@ -121,14 +133,40 @@ plotting the first 10 out of 14 attributes; use max.plot = 14 to plot all
 > par(mar = c(0,0,1,0))
 > plot(st_transform(nc, merc), bgMap = g)
 Warning message:
-plotting the first 10 out of 14 attributes; use max.plot = 14 to plot all 
+plotting the first 10 out of 15 attributes; use max.plot = 15 to plot all 
 > 
 > m = st_make_grid()
-> m = st_segmentize(m, 2e5)
+> st_crs(m) = NA_crs_
+> m = st_segmentize(m, 2)
+> st_crs(m) = 4326
 > plot(m, axes = TRUE)
 > g = st_transform(m, st_crs("+proj=ortho +lat_0=30 +lon_0=45"), check = TRUE)
 > plot(g, axes = TRUE)
 > 
+> nc[[1]] = NA
+> nc[[10]] = 1
+> plot(nc, pal = rainbow, nbreaks = 3)
+Warning messages:
+1: plotting the first 10 out of 15 attributes; use max.plot = 15 to plot all 
+2: In min(x) : no non-missing arguments to min; returning Inf
+3: In max(x) : no non-missing arguments to max; returning -Inf
+> plot(nc, pal = rainbow, breaks = "jenks", nbreaks = 3)
+Warning messages:
+1: plotting the first 10 out of 15 attributes; use max.plot = 15 to plot all 
+2: In min(x) : no non-missing arguments to min; returning Inf
+3: In max(x) : no non-missing arguments to max; returning -Inf
+> plot(nc, pal = rainbow, breaks = (0:10)/3)
+Warning message:
+plotting the first 10 out of 15 attributes; use max.plot = 15 to plot all 
+> 
+> # logz:
+> nc$e = 10^(nc$SID74)
+> plot(nc["e"], logz = TRUE)
+> 
+> # shared key:
+> plot(nc[c("SID74", "SID79")], key.pos = -1)
+> plot(nc[c("BIR74", "BIR79")], key.pos = 1, logz=TRUE)
+> 
 > proc.time()
    user  system elapsed 
-  5.980   0.036   6.014 
+  4.010   0.091   4.093 

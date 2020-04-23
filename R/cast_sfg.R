@@ -11,9 +11,10 @@ Tail1 <- function(lst) lapply(lst, head, -1)
 ClosePol <- function(mtrx) { 
 	stopifnot(is.matrix(mtrx))
 	if (!all(mtrx[1,] == mtrx[nrow(mtrx),])) 
-		rbind(mtrx, mtrx[1,]) 
-	else 
-		mtrx
+		mtrx = rbind(mtrx, mtrx[1,]) 
+	if (nrow(mtrx) < 4)
+		stop("polygons require at least 4 points")
+	mtrx
 }
 
 ## multi-polygon and polygon constructor, allow unclosed (but don't apply auto-closing)
@@ -40,7 +41,8 @@ ClosePol <- function(mtrx) {
 #' @name st_cast
 #' @export
 #' @examples 
-#' example(st_read)
+#' # example(st_read)
+#' nc = st_read(system.file("shape/nc.shp", package="sf"))
 #' mpl <- nc$geometry[[4]]
 #' #st_cast(x) ## error 'argument "to" is missing, with no default'
 #' cast_all <- function(xg) {
@@ -117,7 +119,15 @@ st_cast.MULTIPOINT <- function(x, to, ...) {
          POLYGON = st_polygon(list(unclass(ClosePol(x)))), 
          LINESTRING = st_linestring(unclass(x)),
          ## loss, drop to first coordinate
-         POINT = {warning("point from first coordinate only"); st_point(unclass(x)[1L, , drop = TRUE])},
+         POINT = {
+             if (st_is_empty(x)) {
+                 row <- NA_integer_
+             } else {
+	             warning("point from first coordinate only")
+                 row <- 1L
+             }
+             st_point(unclass(x)[row, , drop = TRUE])
+         },
 		 GEOMETRYCOLLECTION = st_geometrycollection(list(x))
   )
 }
@@ -208,11 +218,20 @@ st_cast.MULTISURFACE <- function(x, to, ...) {
 #' @name st_cast
 #' @export
 st_cast.COMPOUNDCURVE <- function(x, to, ...) {
-	if (! missing(to))
-		stop("to should be missing")
+	if (! missing(to) && to != "LINESTRING")
+		stop("to should be missing or LINESTRING")
 	CPL_compoundcurve_to_linear(structure(list(x), crs = NA_crs_, precision = 0.0, 
 		class = c("sfc_COMPOUNDCURVE", "sfc")))[[1]]
 }
+
+#' @name st_cast
+#' @export
+st_cast.MULTICURVE <- function(x, to, ...) {
+	if (! missing(to) && to != "MULTILINESTRING")
+		stop("to should be missing or MULTILINESTRING")
+	st_multilinestring(lapply(x, st_cast, to = "LINESTRING"))
+}
+
 
 #' @name st_cast
 #' @export

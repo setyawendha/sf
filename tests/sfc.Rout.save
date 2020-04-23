@@ -1,6 +1,6 @@
 
-R version 3.4.2 (2017-09-28) -- "Short Summer"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -24,50 +24,44 @@ Geometry set for 1 feature
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0.3333333 ymin: 0.1666667 xmax: 0.3333333 ymax: 0.1666667
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 precision:      1000 
-POINT (0.333333333333333 0.166666666666667)
+POINT (0.3333333 0.1666667)
 > st_as_sfc(st_as_binary(st_sfc(p, precision = 0L)))
 Geometry set for 1 feature 
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0.3333333 ymin: 0.1666667 xmax: 0.3333333 ymax: 0.1666667
-epsg (SRID):    NA
-proj4string:    NA
-POINT (0.333333333333333 0.166666666666667)
+CRS:            NA
+POINT (0.3333333 0.1666667)
 > st_as_sfc(st_as_binary(st_sfc(p, precision = 1000)))
 Geometry set for 1 feature 
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0.333 ymin: 0.167 xmax: 0.333 ymax: 0.167
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0.333 0.167)
 > st_as_sfc(st_as_binary(st_sfc(p, precision = 1000000)))
 Geometry set for 1 feature 
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0.333333 ymin: 0.166667 xmax: 0.333333 ymax: 0.166667
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0.333333 0.166667)
 > st_as_sfc(st_as_binary(st_sfc(p, precision = 10L)))
 Geometry set for 1 feature 
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0.3 ymin: 0.2 xmax: 0.3 ymax: 0.2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0.3 0.2)
 > st_as_sfc(st_as_binary(st_sfc(p, precision = -1)))
 Geometry set for 1 feature 
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0.3333333 ymin: 0.1666667 xmax: 0.3333333 ymax: 0.1666667
-epsg (SRID):    NA
-proj4string:    NA
-POINT (0.333333343267441 0.16666667163372)
+CRS:            NA
+POINT (0.3333333 0.1666667)
 > 
 > d = data.frame(a = 1:2)
 > d$geom = c("POINT(0 0)", "POINT(1 1)")
@@ -77,8 +71,7 @@ Simple feature collection with 2 features and 1 field
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a        geom
 1 1 POINT (0 0)
 2 2 POINT (1 1)
@@ -87,8 +80,7 @@ Simple feature collection with 2 features and 1 field
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a        geom
 1 1 POINT (0 0)
 2 2 POINT (1 1)
@@ -97,8 +89,7 @@ Simple feature collection with 2 features and 2 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a       geom    geometry
 1 1 POINT(0 0) POINT (0 0)
 2 2 POINT(1 1) POINT (1 1)
@@ -108,8 +99,7 @@ Geometry set for 2 features
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 0)
 POINT (1 1)
 > st_as_sfc(c("POINT(0 0)", "POINT(1 1)", "POLYGON((0 0,1 1,0 1,0 0))"))
@@ -117,29 +107,25 @@ Geometry set for 3 features
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 0)
 POINT (1 1)
 POLYGON ((0 0, 1 1, 0 1, 0 0))
 > st_as_sfc(character(0))
 Geometry set for 0 features 
 bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    NA
-proj4string:    NA
-> st_as_sfc(character(0), 4326)
-Geometry set for 0 features 
-bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
-> st_as_sfc(c("POINT(0 0)", "POINT(1 1)", "POLYGON((0 0,1 1,0 1,0 0))"), 
+CRS:            NA
+> x = st_as_sfc(character(0), 4326)
+> y = st_as_sfc(character(0), crs = 4326)
+> all.equal(x, y)
+[1] TRUE
+> st_as_sfc(c("POINT(0 0)", "POINT(1 1)", "POLYGON((0 0,1 1,0 1,0 0))"),
 + 	"+proj=longlat +datum=WGS84")
 Geometry set for 3 features 
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
+CRS:            +proj=longlat +datum=WGS84
 POINT (0 0)
 POINT (1 1)
 POLYGON ((0 0, 1 1, 0 1, 0 0))
@@ -149,9 +135,16 @@ Simple feature collection with 2 features and 1 field
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 First 1 features:
+  a        geom
+1 1 POINT (0 0)
+> head(st_as_sf(d, wkt = "geom"), 1)
+Simple feature collection with 1 feature and 1 field
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 0 ymax: 0
+CRS:            NA
   a        geom
 1 1 POINT (0 0)
 > 
@@ -168,8 +161,7 @@ Active geometry column: geom
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a        geom    geometry
 1 1 POINT (0 0) POINT (0 0)
 2 2 POINT (1 1) POINT (1 1)
@@ -181,42 +173,27 @@ Geometry set for 2 features
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
+geographic CRS: WGS 84
 POINT (0 1)
 POINT (0 1)
-> st_sfc(x, crs = "+proj=longlat +datum=WGS84 +no_defs")
-Geometry set for 2 features 
-geometry type:  POINT
-dimension:      XY
-bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
-POINT (0 1)
-POINT (0 1)
+> y = st_sfc(x, crs = "+proj=longlat +datum=WGS84 +no_defs")
+Warning message:
+st_crs<- : replacing crs does not reproject data; use st_transform for that 
 > # but do when it changes:
-> st_sfc(x, crs = 3857)
-Geometry set for 2 features 
-geometry type:  POINT
-dimension:      XY
-bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    3857
-proj4string:    +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs
-POINT (0 1)
-POINT (0 1)
+> y = st_sfc(x, crs = 3857)
 Warning message:
 st_crs<- : replacing crs does not reproject data; use st_transform for that 
 > 
 > p = st_point(0:1)
 > st_cast(p, "MULTIPOINT")
-MULTIPOINT (0 1)
+MULTIPOINT ((0 1))
 > mp = st_multipoint(rbind(c(0,1), c(2,2)))
 > st_cast(mp, "POINT")
 POINT (0 1)
 Warning message:
 In st_cast.MULTIPOINT(mp, "POINT") : point from first coordinate only
 > st_cast(mp, "MULTIPOINT")
-MULTIPOINT (0 1, 2 2)
+MULTIPOINT ((0 1), (2 2))
 > 
 > # geometry collection to its elements:
 > st_cast(st_geometrycollection(list(mp)), "POINT")
@@ -224,9 +201,9 @@ POINT (0 1)
 Warning message:
 In st_cast.MULTIPOINT(x[[1]], to, ...) : point from first coordinate only
 > st_cast(st_geometrycollection(list(mp)), "MULTIPOINT")
-MULTIPOINT (0 1, 2 2)
+MULTIPOINT ((0 1), (2 2))
 > st_cast(st_geometrycollection(list(p,mp)), "MULTIPOINT")
-MULTIPOINT (0 1)
+MULTIPOINT ((0 1))
 Warning message:
 In st_cast.GEOMETRYCOLLECTION(st_geometrycollection(list(p, mp)),  :
   only first part of geometrycollection is retained
@@ -238,8 +215,7 @@ Geometry set for 2 features
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 1)
 POINT (0 1)
 Warning message:
@@ -251,9 +227,8 @@ Simple feature collection with 2 features and 1 field
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
-  a    geometry
+CRS:            NA
+  a        geom
 1 3 POINT (0 1)
 2 2 POINT (0 1)
 Warning message:
@@ -266,8 +241,7 @@ Geometry set for 2 features
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 1)
 POINT (0 1)
 Warning message:
@@ -280,8 +254,7 @@ Geometry set for 2 features
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 1)
 POINT (0 1)
 Warning message:
@@ -291,10 +264,9 @@ Geometry set for 2 features
 geometry type:  MULTIPOINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
-MULTIPOINT (0 1)
-MULTIPOINT (0 1)
+CRS:            NA
+MULTIPOINT ((0 1))
+MULTIPOINT ((0 1))
 > 
 > # lines:
 > pts = rbind(c(0,0), c(1,1), c(2,1))
@@ -303,8 +275,7 @@ Geometry set for 2 features
 geometry type:  LINESTRING
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 2 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 LINESTRING (0 0, 1 1, 2 1)
 LINESTRING (0 0, 1 1, 2 1)
 > st_sfc(st_linestring(pts), st_multilinestring(list(pts))) %>% st_cast("MULTILINESTRING")
@@ -312,8 +283,7 @@ Geometry set for 2 features
 geometry type:  MULTILINESTRING
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 2 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 MULTILINESTRING ((0 0, 1 1, 2 1))
 MULTILINESTRING ((0 0, 1 1, 2 1))
 > 
@@ -324,8 +294,7 @@ Geometry set for 2 features
 geometry type:  POLYGON
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POLYGON ((0 0, 1 1, 0 1, 0 0))
 POLYGON ((0 0, 1 1, 0 1, 0 0))
 > st_sfc(st_polygon(list(pts)), st_multipolygon(list(list(pts)))) %>% st_cast("MULTIPOLYGON")
@@ -333,30 +302,27 @@ Geometry set for 2 features
 geometry type:  MULTIPOLYGON
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 MULTIPOLYGON (((0 0, 1 1, 0 1, 0 0)))
 MULTIPOLYGON (((0 0, 1 1, 0 1, 0 0)))
 > 
 > 
-> st_sfc(st_geometrycollection(list(p)), st_geometrycollection(list(mp))) %>% st_cast() 
+> st_sfc(st_geometrycollection(list(p)), st_geometrycollection(list(mp))) %>% st_cast()
 Geometry set for 2 features 
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 1)
-MULTIPOINT (0 1)
-> st_sfc(st_geometrycollection(list(p)), st_geometrycollection(list(mp))) %>% 
-+ 	st_cast() %>% 
+MULTIPOINT ((0 1))
+> st_sfc(st_geometrycollection(list(p)), st_geometrycollection(list(mp))) %>%
++ 	st_cast() %>%
 + 	st_cast("POINT")
 Geometry set for 2 features 
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT (0 1)
 POINT (0 1)
 Warning message:
@@ -366,29 +332,24 @@ In st_cast.MULTIPOINT(X[[i]], ...) : point from first coordinate only
 > pol = st_polygon(list(p))
 > # plot(pol)
 > try(plot(st_polygonize(pol))) # --> breaks
-Error : inherits(x, "sfc_LINESTRING") || inherits(x, "sfc_MULTILINESTRING") is not TRUE
+Error in st_polygonize.sfc(st_sfc(x)) : 
+  inherits(x, "sfc_LINESTRING") || inherits(x, "sfc_MULTILINESTRING") is not TRUE
 > st_length(st_sfc(st_point(c(0,0))))
 [1] 0
 > 
 > try(as(st_sfc(st_linestring(matrix(1:9,3))), "Spatial"))
-Error in StopZ(zm) : Z not supported: use st_zm first to drop Z?
+Error in StopZ(zm) : 
+  sp supports Z dimension only for POINT and MULTIPOINT.
+use `st_zm(...)` to coerce to XY dimensions
 > 
 > # check conus is present:
-> x = st_sfc(st_point(c(-90,35)), st_point(c(-80,36)), 
+> x = st_sfc(st_point(c(-90,35)), st_point(c(-80,36)),
 + 	crs = "+proj=longlat +datum=NAD27")
-> st_transform(x, 3857)
-Geometry set for 2 features 
-geometry type:  POINT
-dimension:      XY
-bbox:           xmin: -10018760 ymin: 4163894 xmax: -8905533 ymax: 4300640
-epsg (SRID):    3857
-proj4string:    +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs
-POINT (-10018764.3099097 4163893.70169306)
-POINT (-8905532.70139521 4300640.2154045)
+> y = st_transform(x, 3857)
 > 
 > sf_extSoftVersion()[1:3]
    GEOS    GDAL  proj.4 
-"3.5.1" "2.2.1" "4.9.2" 
+"3.8.0" "3.0.2" "6.2.1" 
 > 
 > # Ops.sfc:
 > ls = st_sfc(st_linestring(rbind(c(0,0),c(0,1))))
@@ -397,28 +358,63 @@ Geometry set for 1 feature
 geometry type:  LINESTRING
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 0 ymax: 2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 LINESTRING (0 0, 0 2)
 > ls - 2
 Geometry set for 1 feature 
 geometry type:  LINESTRING
 dimension:      XY
 bbox:           xmin: -2 ymin: -2 xmax: -2 ymax: -1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 LINESTRING (-2 -2, -2 -1)
 > (ls + 2) %% 3
 Geometry set for 1 feature 
 geometry type:  LINESTRING
 dimension:      XY
 bbox:           xmin: 2 ymin: 0 xmax: 2 ymax: 2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 LINESTRING (2 2, 2 0)
+> ls / ls
+Geometry set for 1 feature  (with 1 geometry empty)
+geometry type:  GEOMETRYCOLLECTION
+dimension:      XY
+bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
+CRS:            NA
+GEOMETRYCOLLECTION EMPTY
+> p_ = st_point(0:1)
+> ll = st_sfc(ls[[1]], p_)
+> ll & st_sfc(p_)
+Geometry set for 2 features 
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
+CRS:            NA
+POINT (0 1)
+POINT (0 1)
+> ll | st_sfc(p_)
+Geometry set for 2 features 
+geometry type:  GEOMETRY
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 0 ymax: 1
+CRS:            NA
+LINESTRING (0 0, 0 1)
+POINT (0 1)
+> ll %/% st_sfc(p_)
+Geometry set for 2 features  (with 1 geometry empty)
+geometry type:  GEOMETRY
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 0 ymax: 1
+CRS:            NA
+LINESTRING (0 0, 0 1)
+GEOMETRYCOLLECTION EMPTY
+> ll == st_sfc(p_)
+[1] FALSE  TRUE
+> ll != st_sfc(p_)
+[1]  TRUE FALSE
+> 
 > 
 > str(x)
-sfc_POINT of length 2; first list element: Classes 'XY', 'POINT', 'sfg'  num [1:2] -90 35
+sfc_POINT of length 2; first list element:  'XY' num [1:2] -90 35
 > nc = st_read(system.file("shape/nc.shp", package="sf"), quiet = TRUE)
 > str(nc)
 Classes 'sf' and 'data.frame':	100 obs. of  15 variables:
@@ -443,14 +439,9 @@ Classes 'sf' and 'data.frame':	100 obs. of  15 variables:
  - attr(*, "sf_column")= chr "geometry"
  - attr(*, "agr")= Factor w/ 3 levels "constant","aggregate",..: NA NA NA NA NA NA NA NA NA NA ...
   ..- attr(*, "names")= chr  "AREA" "PERIMETER" "CNTY_" "CNTY_ID" ...
-> st_as_sfc(st_bbox(nc))
-Geometry set for 1 feature 
-geometry type:  POLYGON
-dimension:      XY
-bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
-epsg (SRID):    4267
-proj4string:    +proj=longlat +datum=NAD27 +no_defs
-POLYGON ((-84.3238525390625 33.8819923400879, -...
+> bb = st_as_sfc(st_bbox(nc))
+> format(st_bbox(nc))
+[1] "((-84.32385,33.88199),(-75.45698,36.58965))"
 > 
 > st_agr("constant")
 [1] constant
@@ -467,8 +458,7 @@ Attribute-geometry relationship: 2 constant, 0 aggregate, 0 identity
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: -90 ymin: 35 xmax: -80 ymax: 36
-epsg (SRID):    4267
-proj4string:    +proj=longlat +ellps=clrk66 +nadgrids=@conus,@alaska,@ntv2_0.gsb,@ntv1_can.dat +no_defs
+CRS:            +proj=longlat +datum=NAD27
   a b           geom
 1 1 3 POINT (-90 35)
 2 2 4 POINT (-80 36)
@@ -479,8 +469,7 @@ Simple feature collection with 2 features and 1 field
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 3 ymin: 4 xmax: 3 ymax: 4
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a        geom
 1 x POINT (3 4)
 2 y POINT (3 4)
@@ -493,14 +482,50 @@ xmin ymin xmax ymax
      xmin      ymin      xmax      ymax 
 -84.32385  33.88199 -75.45698  36.58965 
 > st_crs(bb)
-$epsg
-[1] 4267
-
-$proj4string
-[1] "+proj=longlat +datum=NAD27 +no_defs"
-
-attr(,"class")
-[1] "crs"
+Coordinate Reference System:
+  User input: NAD27 
+  wkt:
+GEOGCRS["NAD27",
+    DATUM["North American Datum 1927",
+        ELLIPSOID["Clarke 1866",6378206.4,294.978698213898,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["latitude",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["longitude",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4267]]
+> st_bbox(c(xmin = 16.1, xmax = 16.6, ymin = 48.6, ymax = 47.9), crs = st_crs(4326))
+xmin ymin xmax ymax 
+16.1 48.6 16.6 47.9 
+> st_bbox(c(xmin = 16.1, xmax = 16.6, ymin = 48.6, ymax = 47.9), crs = 4326)
+xmin ymin xmax ymax 
+16.1 48.6 16.6 47.9 
+> 
+> bb$xrange
+     xmin      xmax 
+-84.32385 -75.45698 
+> bb$yrange
+    ymin     ymax 
+33.88199 36.58965 
+> bb$xmin
+     xmin 
+-84.32385 
+> bb$ymin
+    ymin 
+33.88199 
+> bb$xmax
+     xmax 
+-75.45698 
+> bb$ymax
+    ymax 
+36.58965 
+> try(bb$foo)
+Error in `$.bbox`(bb, foo) : unsupported name
 > 
 > # merge:
 > a = data.frame(a = 1:3, b = 5:7)
@@ -511,8 +536,7 @@ Simple feature collection with 2 features and 3 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   b a x    geometry
 1 5 1 b POINT (0 0)
 2 6 2 c POINT (1 1)
@@ -521,8 +545,7 @@ Simple feature collection with 4 features and 3 fields (with 1 geometry empty)
 geometry type:  GEOMETRY
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 2 ymax: 2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   b  a    x                 geometry
 1 2 NA    a GEOMETRYCOLLECTION EMPTY
 2 5  1    b              POINT (0 0)
@@ -536,8 +559,7 @@ Simple feature collection with 2 features and 3 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a b x    geometry
 1 1 5 b POINT (0 0)
 2 2 6 c POINT (1 1)
@@ -547,8 +569,7 @@ Simple feature collection with 3 features and 3 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 2 ymax: 2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a b    x    geometry
 1 1 5    b POINT (0 0)
 2 2 6    c POINT (1 1)
@@ -559,20 +580,18 @@ Simple feature collection with 3 features and 3 fields (with 1 geometry empty)
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
    a b x    geometry
-1 NA 2 a POINT EMPTY
-2  1 5 b POINT (0 0)
-3  2 6 c POINT (1 1)
+1  1 5 b POINT (0 0)
+2  2 6 c POINT (1 1)
+3 NA 2 a POINT EMPTY
 > full_join(a, b)
 Joining, by = "b"
 Simple feature collection with 4 features and 3 fields (with 1 geometry empty)
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 2 ymax: 2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
    a b    x    geometry
 1  1 5    b POINT (0 0)
 2  2 6    c POINT (1 1)
@@ -584,8 +603,7 @@ Simple feature collection with 2 features and 2 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a b    geometry
 1 1 5 POINT (0 0)
 2 2 6 POINT (1 1)
@@ -595,10 +613,19 @@ Simple feature collection with 1 feature and 2 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 2 ymin: 2 xmax: 2 ymax: 2
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
   a b    geometry
 1 3 7 POINT (2 2)
+> left_join(a, data.frame(b, geometry = 1), by = "b")
+Simple feature collection with 3 features and 4 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 2 ymax: 2
+CRS:            NA
+  a b    x geometry.y  geometry.x
+1 1 5    b          1 POINT (0 0)
+2 2 6    c          1 POINT (1 1)
+3 3 7 <NA>         NA POINT (2 2)
 > 
 > # st_joins:
 > a = st_sf(a = 1:3,
@@ -610,8 +637,7 @@ Simple feature collection with 4 features and 2 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 1 ymin: 1 xmax: 3 ymax: 3
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
     a.x a.y        geom
 1     1  NA POINT (1 1)
 2     2  12 POINT (2 2)
@@ -622,20 +648,56 @@ Simple feature collection with 3 features and 2 fields
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 2 ymin: 2 xmax: 3 ymax: 3
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
     a.x a.y        geom
 2     2  12 POINT (2 2)
 2.1   2  13 POINT (2 2)
 3     3  14 POINT (3 3)
-> # deprecated:
-> try(x <- st_join(a, b, FUN = mean))
-Error in st_join(a, b, FUN = mean) : 
-  for aggregation/summarising after st_join, see examples in ?st_join
-In addition: Warning message:
-'st_join' is deprecated.
-Use 'aggregate' instead.
-See help("Deprecated") 
+> # st_join, largest = TRUE:
+> nc <- st_transform(st_read(system.file("shape/nc.shp", package="sf")), 2264)
+Reading layer `nc' from data source `/home/edzer/git/sf.Rcheck/sf/shape/nc.shp' using driver `ESRI Shapefile'
+Simple feature collection with 100 features and 14 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+geographic CRS: NAD27
+> gr = st_sf(
++     label = apply(expand.grid(1:10, LETTERS[10:1])[,2:1], 1, paste0, collapse = " "),
++ 	geom = st_make_grid(st_as_sfc(st_bbox(nc))))
+> gr$col = sf.colors(10, categorical = TRUE, alpha = .3)
+> # cut, to check, NA's work out:
+> gr = gr[-(1:30),]
+> st_join(nc, gr, largest = TRUE)
+Simple feature collection with 100 features and 16 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: 406262.2 ymin: 48374.87 xmax: 3052887 ymax: 1044158
+projected CRS:  NAD83 / North Carolina (ftUS)
+First 10 features:
+    AREA PERIMETER CNTY_ CNTY_ID        NAME  FIPS FIPSNO CRESS_ID BIR74 SID74
+1  0.114     1.442  1825    1825        Ashe 37009  37009        5  1091     1
+2  0.061     1.231  1827    1827   Alleghany 37005  37005        3   487     0
+3  0.143     1.630  1828    1828       Surry 37171  37171       86  3188     5
+4  0.070     2.968  1831    1831   Currituck 37053  37053       27   508     1
+5  0.153     2.206  1832    1832 Northampton 37131  37131       66  1421     9
+6  0.097     1.670  1833    1833    Hertford 37091  37091       46  1452     7
+7  0.062     1.547  1834    1834      Camden 37029  37029       15   286     0
+8  0.091     1.284  1835    1835       Gates 37073  37073       37   420     0
+9  0.118     1.421  1836    1836      Warren 37185  37185       93   968     4
+10 0.124     1.428  1837    1837      Stokes 37169  37169       85  1612     1
+   NWBIR74 BIR79 SID79 NWBIR79 label       col                       geometry
+1       10  1364     0      19  A  4 #fb80724d MULTIPOLYGON (((1270814 913...
+2       10   542     3      12  A  4 #fb80724d MULTIPOLYGON (((1340555 959...
+3      208  3616     6     260  A  5 #80b1d34d MULTIPOLYGON (((1570591 910...
+4      123   830     2     145  A 10 #bc80bd4d MULTIPOLYGON (((2881208 948...
+5     1066  1606     3    1197  A  8 #fccde54d MULTIPOLYGON (((2525701 911...
+6      954  1838     5    1237  A  9 #d9d9d94d MULTIPOLYGON (((2665113 911...
+7      115   350     2     139  A 10 #bc80bd4d MULTIPOLYGON (((2881208 948...
+8      254   594     2     371  A  9 #d9d9d94d MULTIPOLYGON (((2717989 951...
+9      748  1190     2     844  A  8 #fccde54d MULTIPOLYGON (((2203890 914...
+10     160  2038     5     176  A  5 #80b1d34d MULTIPOLYGON (((1697624 911...
+Warning message:
+attribute variables are assumed to be spatially constant throughout all geometries 
 > 
 > # rbind:
 > x = st_sf(a = 1:2, geom = st_sfc(list(st_point(0:1), st_point(0:1)), crs = 4326))
@@ -644,8 +706,7 @@ Simple feature collection with 6 features and 1 field
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
+geographic CRS: WGS 84
   a        geom
 1 1 POINT (0 1)
 2 2 POINT (0 1)
@@ -658,50 +719,56 @@ proj4string:    +proj=longlat +datum=WGS84 +no_defs
 [1] TRUE
 > 
 > # st_sample:
+> suppressWarnings(RNGversion("3.5.3"))
 > set.seed(131)
 > options(digits=6)
-> x = st_sfc(st_polygon(list(rbind(c(0,0),c(90,0),c(90,90),c(0,90),c(0,0)))), crs = st_crs(4326))
-> (p <- st_sample(x, 10))
+> x = st_sfc(st_polygon(list(rbind(c(0,1),c(90,1),c(90,90),c(0,90),c(0,1)))), crs = st_crs(4326))
+> #if (sf_extSoftVersion()["proj.4"] >= "4.9.0")
+>   (p <- st_sample(x, 10))
+although coordinates are longitude/latitude, st_relate_pattern assumes that they are planar
+although coordinates are longitude/latitude, st_intersects assumes that they are planar
 although coordinates are longitude/latitude, st_intersects assumes that they are planar
 Geometry set for 10 features 
 geometry type:  POINT
 dimension:      XY
-bbox:           xmin: 11.24479 ymin: 2.201237 xmax: 82.34507 ymax: 59.90034
-epsg (SRID):    4326
-proj4string:    +proj=longlat +datum=WGS84 +no_defs
+bbox:           xmin: 11.2448 ymin: 3.16385 xmax: 82.3451 ymax: 60.1703
+geographic CRS: WGS 84
 First 5 geometries:
-POINT (18.579327701591 24.5979510914074)
-POINT (11.2447945447639 20.1599067791835)
-POINT (26.3945853430778 59.9003352040191)
-POINT (33.8201717427 18.4236330568178)
-POINT (76.171215204522 31.5416755356696)
+POINT (18.5793 25.2416)
+POINT (11.2448 20.8596)
+POINT (26.3946 60.1703)
+POINT (33.8202 19.146)
+POINT (76.1712 32.1029)
 > x = st_sfc(st_polygon(list(rbind(c(0,0),c(90,0),c(90,90),c(0,90),c(0,0))))) # NOT long/lat:
-> st_sample(x, 10)
-Geometry set for 10 features 
-geometry type:  POINT
-dimension:      XY
-bbox:           xmin: 13.51135 ymin: 6.005704 xmax: 82.78265 ymax: 63.18553
-epsg (SRID):    NA
-proj4string:    NA
-First 5 geometries:
-POINT (19.2714130226523 21.4671036042273)
-POINT (57.340495493263 37.6075198757462)
-POINT (56.2872428074479 6.00570423994213)
-POINT (36.0554852569476 10.193104497157)
-POINT (52.4428965803236 33.3666403102688)
+> p <- st_sample(x, 10)
 > x = st_sfc(st_polygon(list(rbind(c(-180,-90),c(180,-90),c(180,90),c(-180,90),c(-180,-90)))),
 +  crs=st_crs(4326))
-> p <- st_sample(x, 10)
+> if (sf_extSoftVersion()["proj.4"] >= "4.9.0") # lwgeom breaks on this
++   (p <- st_sample(x, 10))
+although coordinates are longitude/latitude, st_relate_pattern assumes that they are planar
 although coordinates are longitude/latitude, st_intersects assumes that they are planar
+although coordinates are longitude/latitude, st_intersects assumes that they are planar
+Geometry set for 10 features 
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -170.749 ymin: -64.7878 xmax: 172.194 ymax: 74.44
+geographic CRS: WGS 84
+First 5 geometries:
+POINT (48.8473 9.37328)
+POINT (48.5555 -52.7577)
+POINT (-102.634 -35.823)
+POINT (158.155 -47.3308)
+POINT (72.1339 -25.5048)
 > pt = st_multipoint(matrix(1:20,,2))
 > st_sample(p, 3)
 Geometry set for 1 feature 
 geometry type:  MULTIPOINT
 dimension:      XY
-bbox:           xmin: -15.77728 ymin: -22.46808 xmax: 143.823 ymax: 27.16136
-epsg (SRID):    NA
-proj4string:    NA
-MULTIPOINT (48.8473404105753 9.37328114613777, ...
+bbox:           xmin: -15.7773 ymin: -22.4681 xmax: 143.823 ymax: 27.1614
+CRS:            NA
+MULTIPOINT ((48.8473 9.37328), (143.823 27.1614...
+> try(st_sample(p, 3.3))
+Error in st_sample.sfc(p, 3.3) : size should be an integer
 > ls = st_sfc(st_linestring(rbind(c(0,0),c(0,1))),
 +  st_linestring(rbind(c(0,0),c(.1,0))),
 +  st_linestring(rbind(c(0,1),c(.1,1))),
@@ -710,32 +777,65 @@ MULTIPOINT (48.8473404105753 9.37328114613777, ...
 Geometry set for 4 features  (with 1 geometry empty)
 geometry type:  MULTIPOINT
 dimension:      XY
-bbox:           xmin: 0 ymin: 0 xmax: 0.09147282 ymax: 1
-epsg (SRID):    NA
-proj4string:    NA
-MULTIPOINT (0 0.302590963631447, 0 0.2514388173...
-MULTIPOINT (0.0914728223831462 0, 0.07385200875...
-MULTIPOINT (0.0488222356901458 1, 0.07165077139...
+bbox:           xmin: 0 ymin: 0 xmax: 0.0914728 ymax: 1
+CRS:            NA
+MULTIPOINT ((0 0.302591), (0 0.251439), (0 0.22...
+MULTIPOINT ((0.0914728 0), (0.073852 0), (0.003...
+MULTIPOINT ((0.0488222 1), (0.0716508 1), (0.08...
 MULTIPOINT EMPTY
 > st_sample(nc[1:2,], size = c(10,20))
-although coordinates are longitude/latitude, st_intersects assumes that they are planar
-although coordinates are longitude/latitude, st_intersects assumes that they are planar
-Geometry set for 24 features 
+Geometry set for 30 features 
 geometry type:  POINT
 dimension:      XY
-bbox:           xmin: -81.66639 ymin: 36.29542 xmax: -80.96982 ymax: 36.56871
-epsg (SRID):    4267
-proj4string:    +proj=longlat +datum=NAD27 +no_defs
+bbox:           xmin: 1215230 ymin: 935867 xmax: 1428880 ymax: 1031900
+projected CRS:  NAD83 / North Carolina (ftUS)
 First 5 geometries:
-POINT (-81.6663939738046 36.5562903100378)
-POINT (-81.4734699225191 36.4148674289981)
-POINT (-81.4985141439355 36.2954179169056)
-POINT (-81.5255186840243 36.3320840914148)
-POINT (-81.6410816551367 36.3952045484235)
+POINT (1215227 1031901)
+POINT (1271918 979879)
+POINT (1264558 935867)
+POINT (1256623 949384)
+POINT (1222665 972639)
+> # try with LINES, LongLat, should generate a warning:
+> nc[1:2,] %>% st_transform(4326) %>% st_cast("MULTILINESTRING") %>% st_sample(size = c(10,20))
+although coordinates are longitude/latitude, st_sample assumes that they are planar
+although coordinates are longitude/latitude, st_sample assumes that they are planar
+Geometry set for 2 features 
+geometry type:  MULTIPOINT
+dimension:      XY
+bbox:           xmin: -81.6893 ymin: 36.2492 xmax: -80.914 ymax: 36.583
+geographic CRS: WGS 84
+MULTIPOINT ((-81.3189 36.4974), (-81.4017 36.57...
+MULTIPOINT ((-80.9809 36.3787), (-81.1251 36.42...
+> st_sample(ls, 80, type = "regular")
+Geometry set for 4 features  (with 1 geometry empty)
+geometry type:  MULTIPOINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 0.0967604 ymax: 1
+CRS:            NA
+MULTIPOINT ((0 0.00175127), (0 0.0167514), (0 0...
+MULTIPOINT ((0.00675965 0), (0.0217598 0), (0.0...
+MULTIPOINT ((0.0117605 1), (0.0267606 1), (0.04...
+MULTIPOINT EMPTY
+> p_sample = lapply(1:10, function(i) st_sample(nc[i, ], 100, exact = FALSE))
+> lengths(p_sample)
+ [1] 103 107 109  97  97 119  87 106 103 100
+> p_sample_exact = lapply(1:10, function(i) st_sample(nc[i, ], 100, exact = TRUE))
+> lengths(p_sample_exact)
+ [1] 100 100 100 100 100 100 100 100 100 100
+> #plot(nc$geometry[1])
+> #plot(p_sample[[1]], add = TRUE)
+> #plot(p_sample_exact[[1]], add = TRUE)
 > 
 > #class(st_bind_cols(nc, as.data.frame(nc)[1:3]))
 > class(dplyr::bind_cols(nc, as.data.frame(nc)[1:3]))
-[1] "sf"         "data.frame"
+New names:
+* AREA -> AREA...1
+* PERIMETER -> PERIMETER...2
+* CNTY_ -> CNTY_...3
+* AREA -> AREA...16
+* PERIMETER -> PERIMETER...17
+* ...
+[1] "data.frame"
 > class(rbind(nc, nc))
 [1] "sf"         "data.frame"
 > class(cbind(nc, nc))
@@ -747,8 +847,7 @@ Geometry set for 5 features  (with 3 geometries empty)
 geometry type:  POINT
 dimension:      XY
 bbox:           xmin: 0 ymin: 1 xmax: 2 ymax: 3
-epsg (SRID):    NA
-proj4string:    NA
+CRS:            NA
 POINT EMPTY
 POINT (0 1)
 POINT EMPTY
@@ -765,17 +864,17 @@ POINT EMPTY
 Geometry set for 1 feature 
 geometry type:  POINT
 dimension:      XY
-bbox:           xmin: 0.08400355 ymin: 1.027957 xmax: 0.08400355 ymax: 1.027957
-epsg (SRID):    NA
-proj4string:    NA
-POINT (0.0840035506989807 1.02795670260675)
+bbox:           xmin: -0.0070472 ymin: 1.09548 xmax: -0.0070472 ymax: 1.09548
+CRS:            NA
+POINT (-0.0070472 1.09548)
 > 
 > # st_bbox:
 > library(sp)
 > demo(meuse, ask = FALSE, echo = FALSE)
-> st_bbox(meuse)
+> suppressWarnings(st_bbox(meuse))
   xmin   ymin   xmax   ymax 
 178605 329714 181390 333611 
+> crs = suppressWarnings(st_crs(meuse))
 > library(raster)
 
 Attaching package: 'raster'
@@ -784,18 +883,261 @@ The following object is masked from 'package:dplyr':
 
     select
 
-> st_bbox(raster(meuse.grid))
+> suppressWarnings(st_bbox(raster(meuse.grid)))
   xmin   ymin   xmax   ymax 
 178440 329600 181560 333760 
+> st_bbox(extent(raster()))
+xmin ymin xmax ymax 
+-180  -90  180   90 
 > 
 > # st_to_s2
-> x = sf:::st_to_s2(nc)
-> x1 = st_geometry(x)
-> cc = st_coordinates(x1)
-> summary(sqrt(cc[,1]^2+cc[,2]^2+cc[,3]^2))
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-      1       1       1       1       1       1 
+> if (FALSE) { # stops working with GDAL 2.3.0 / PROJ 5.0.1:
++  x = sf:::st_to_s2(nc)
++  x1 = st_geometry(x)
++  cc = st_coordinates(x1)
++  summary(sqrt(cc[,1]^2+cc[,2]^2+cc[,3]^2))
++ }
+> 
+> # check_ring_dir
+> m = rbind(c(0,0), c(0,1), c(1,1), c(1,0), c(0,0))
+> mi = m[nrow(m):1,]
+> pol = st_polygon(list(m * 10, m + .5, mi + 1.5, mi + 3.5, m + 5, mi + 6.5))
+> st_sfc(pol)
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 10 ymax: 10
+CRS:            NA
+POLYGON ((0 0, 0 10, 10 10, 10 0, 0 0), (0.5 0....
+> x = st_sfc(pol, check_ring_dir=TRUE)
+> y = st_sf(a = 1, geom = st_sfc(pol), check_ring_dir=TRUE)
+> str(x)
+sfc_POLYGON of length 1; first list element: List of 6
+ $ : num [1:5, 1:2] 0 10 10 0 0 0 0 10 10 0
+ $ : num [1:5, 1:2] 0.5 0.5 1.5 1.5 0.5 0.5 1.5 1.5 0.5 0.5
+ $ : num [1:5, 1:2] 1.5 1.5 2.5 2.5 1.5 1.5 2.5 2.5 1.5 1.5
+ $ : num [1:5, 1:2] 3.5 3.5 4.5 4.5 3.5 3.5 4.5 4.5 3.5 3.5
+ $ : num [1:5, 1:2] 5 5 6 6 5 5 6 6 5 5
+ $ : num [1:5, 1:2] 6.5 6.5 7.5 7.5 6.5 6.5 7.5 7.5 6.5 6.5
+ - attr(*, "class")= chr [1:3] "XY" "POLYGON" "sfg"
+> x = st_sfc(st_polygon(), st_polygon(), check_ring_dir=TRUE)
+> str(x)
+sfc_POLYGON of length 2; first list element:  list()
+ - attr(*, "class")= chr [1:3] "XY" "POLYGON" "sfg"
+> # empty ring/zero area:
+> x = st_sfc(st_polygon(list(m[c(1,3,1),])), check_ring_dir=TRUE)
+> 
+> mp = st_multipolygon(list(pol, pol))
+> try(x <- st_sfc(mp, st_polygon(), check_ring_dir=TRUE))
+Error in check_ring_dir(lst) : 
+  check_ring_dir: not supported for class sfc_GEOMETRY
+> x <- st_sfc(mp, pol) %>% st_cast("MULTIPOLYGON") %>% st_sfc(check_ring_dir=TRUE)
+> x
+Geometry set for 2 features 
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 10 ymax: 10
+CRS:            NA
+MULTIPOLYGON (((0 0, 10 0, 10 10, 0 10, 0 0), (...
+MULTIPOLYGON (((0 0, 10 0, 10 10, 0 10, 0 0), (...
+> str(x)
+sfc_MULTIPOLYGON of length 2; first list element: List of 2
+ $ :List of 6
+  ..$ : num [1:5, 1:2] 0 10 10 0 0 0 0 10 10 0
+  ..$ : num [1:5, 1:2] 0.5 0.5 1.5 1.5 0.5 0.5 1.5 1.5 0.5 0.5
+  ..$ : num [1:5, 1:2] 1.5 1.5 2.5 2.5 1.5 1.5 2.5 2.5 1.5 1.5
+  ..$ : num [1:5, 1:2] 3.5 3.5 4.5 4.5 3.5 3.5 4.5 4.5 3.5 3.5
+  ..$ : num [1:5, 1:2] 5 5 6 6 5 5 6 6 5 5
+  ..$ : num [1:5, 1:2] 6.5 6.5 7.5 7.5 6.5 6.5 7.5 7.5 6.5 6.5
+  ..- attr(*, "class")= chr [1:3] "XY" "POLYGON" "sfg"
+ $ :List of 6
+  ..$ : num [1:5, 1:2] 0 10 10 0 0 0 0 10 10 0
+  ..$ : num [1:5, 1:2] 0.5 0.5 1.5 1.5 0.5 0.5 1.5 1.5 0.5 0.5
+  ..$ : num [1:5, 1:2] 1.5 1.5 2.5 2.5 1.5 1.5 2.5 2.5 1.5 1.5
+  ..$ : num [1:5, 1:2] 3.5 3.5 4.5 4.5 3.5 3.5 4.5 4.5 3.5 3.5
+  ..$ : num [1:5, 1:2] 5 5 6 6 5 5 6 6 5 5
+  ..$ : num [1:5, 1:2] 6.5 6.5 7.5 7.5 6.5 6.5 7.5 7.5 6.5 6.5
+  ..- attr(*, "class")= chr [1:3] "XY" "POLYGON" "sfg"
+ - attr(*, "class")= chr [1:3] "XY" "MULTIPOLYGON" "sfg"
+> 
+> x = st_sfc(st_linestring(rbind(c(-179,0),c(179,0))), crs = 4326)
+> st_wrap_dateline(st_sf(a = 1, geometry = x))
+Simple feature collection with 1 feature and 1 field
+geometry type:  MULTILINESTRING
+dimension:      XY
+bbox:           xmin: -180 ymin: 0 xmax: 180 ymax: 0
+geographic CRS: WGS 84
+  a                       geometry
+1 1 MULTILINESTRING ((-179 0, -...
+> st_wrap_dateline(x)
+Geometry set for 1 feature 
+geometry type:  MULTILINESTRING
+dimension:      XY
+bbox:           xmin: -180 ymin: 0 xmax: 180 ymax: 0
+geographic CRS: WGS 84
+MULTILINESTRING ((-179 0, -180 0), (180 0, 179 0))
+> st_wrap_dateline(x[[1]])
+MULTILINESTRING ((-179 0, -180 0), (180 0, 179 0))
+> 
+> geo <- c("{\"geodesic\":true,\"type\":\"Point\",\"coordinates\":[-118.68152563269095,36.43764870908927]}",
++          "{\"geodesic\":true,\"type\":\"Point\",\"coordinates\":[-118.67408758213843,36.43366018922779]}",
++          "{\"geodesic\":true,\"type\":\"Point\",\"coordinates\":[-118.67708346361097,36.44208638659282]}",
++          "{\"geodesic\":true,\"type\":\"Point\",\"coordinates\":[-118.67886661944996,36.44110273135671]}",
++          "{\"geodesic\":true,\"type\":\"Point\",\"coordinates\":[-118.68089232041565,36.44173155205561]}")
+> st_as_sfc(geo, GeoJSON = TRUE)
+Geometry set for 5 features 
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -118.682 ymin: 36.4337 xmax: -118.674 ymax: 36.4421
+geographic CRS: WGS 84
+POINT (-118.682 36.4376)
+POINT (-118.674 36.4337)
+POINT (-118.677 36.4421)
+POINT (-118.679 36.4411)
+POINT (-118.681 36.4417)
+> st_as_sfc(geo, GeoJSON = TRUE, crs = 4326)
+Geometry set for 5 features 
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -118.682 ymin: 36.4337 xmax: -118.674 ymax: 36.4421
+geographic CRS: WGS 84
+POINT (-118.682 36.4376)
+POINT (-118.674 36.4337)
+POINT (-118.677 36.4421)
+POINT (-118.679 36.4411)
+POINT (-118.681 36.4417)
+> 
+> st_as_sfc(st_as_binary(st_sfc(st_point(0:1)))[[1]], crs = 4326)
+Geometry set for 1 feature 
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
+geographic CRS: WGS 84
+POINT (0 1)
+> 
+> x = nc
+> x$geom = NULL
+> class(x)
+[1] "sf"         "data.frame"
+> 
+> st_as_sfc(list(st_point(0:1)), crs = 4326)
+Geometry set for 1 feature 
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
+geographic CRS: WGS 84
+POINT (0 1)
+> 
+> # crop:
+> box = c(xmin = 0, ymin = 0, xmax = 1, ymax = 1)
+> 
+> pol = st_sfc(st_buffer(st_point(c(.5, .5)), .65))
+> pol_sf = st_sf(a=1, geom=pol)
+> 
+> st_crop(pol, box)
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:            NA
+POLYGON ((1 0.0849179, 0.983044 0.0650651, 0.95...
+> st_crop(pol, st_bbox(box))
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:            NA
+POLYGON ((1 0.0849179, 0.983044 0.0650651, 0.95...
+> st_crop(pol_sf, box)
+Simple feature collection with 1 feature and 1 field
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:            NA
+  a                           geom
+1 1 POLYGON ((1 0.0849179, 0.98...
+Warning message:
+attribute variables are assumed to be spatially constant throughout all geometries 
+> st_crop(pol_sf, st_bbox(box))
+Simple feature collection with 1 feature and 1 field
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 1 ymax: 1
+CRS:            NA
+  a                           geom
+1 1 POLYGON ((1 0.0849179, 0.98...
+Warning message:
+attribute variables are assumed to be spatially constant throughout all geometries 
+> 
+> # new sample methods:
+> x = st_sfc(st_polygon(list(rbind(c(0,0),c(90,0),c(90,90),c(0,90),c(0,0))))) # NOT long/lat:
+> p <- st_sample(x, 10, type = "regular")
+> p <- st_sample(x, 10, type = "hexagonal")
+> 
+> all.equal(st_drop_geometry(pol_sf), st_set_geometry(pol_sf, NULL))
+[1] TRUE
+> 
+> # https://github.com/r-spatial/sf/issues/1024
+> shape1 <-st_sfc(st_polygon(list(rbind(c(0,0), c(1,0), c(3,2), c(2,4), c(1,4), c(0,0)))))
+> shape2 <- st_sfc(st_polygon())
+> shape3 <- st_sfc(st_polygon())
+> 
+> shape4 = st_intersection(shape2, shape3) # has zero features
+> 
+> st_difference(shape1, shape4)
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 3 ymax: 4
+CRS:            NA
+POLYGON ((0 0, 1 0, 3 2, 2 4, 1 4, 0 0))
+> st_difference(shape4, shape1)
+Geometry set for 0 features 
+bbox:           xmin: NA ymin: NA xmax: NA ymax: NA
+CRS:            NA
+> st_sym_difference(shape1, shape4)
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 3 ymax: 4
+CRS:            NA
+POLYGON ((0 0, 1 0, 3 2, 2 4, 1 4, 0 0))
+> st_union(shape1, shape4)
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 3 ymax: 4
+CRS:            NA
+POLYGON ((0 0, 1 0, 3 2, 2 4, 1 4, 0 0))
+> st_union(shape4, shape1)
+Geometry set for 1 feature 
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 0 ymin: 0 xmax: 3 ymax: 4
+CRS:            NA
+POLYGON ((0 0, 1 0, 3 2, 2 4, 1 4, 0 0))
+> 
+> # transform empty:
+> tr = st_sf(geom=st_sfc()) %>% st_set_crs(3587) %>% st_transform(4326)
+> 
+> # NA values are converted to empty; #1114:
+> x <- data.frame(name=LETTERS)
+> y <- data.frame(name=LETTERS[1:13], letters[14:26])
+> y$geometry <- st_sfc(st_point(c(0,0)))
+> y <- st_sf(y)
+> out = merge(x, y, all.x=TRUE)
+> class(out)
+[1] "data.frame"
+> 
+> st_as_sf(st_sfc(st_point(0:1)))
+Simple feature collection with 1 feature and 0 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 0 ymin: 1 xmax: 0 ymax: 1
+CRS:            NA
+            x
+1 POINT (0 1)
 > 
 > proc.time()
    user  system elapsed 
-  2.784   0.304   2.785 
+  5.507   0.085   5.586 

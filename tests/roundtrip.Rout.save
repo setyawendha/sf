@@ -1,6 +1,6 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.6.3 (2020-02-29) -- "Holding the Windsock"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -48,31 +48,27 @@ attr(,"package")
 > 
 > # SpatialMultiPoints
 > library(sp)
+> suppressWarnings(RNGversion("3.5.3"))
 > set.seed(1331)
-> example(SpatialMultiPoints, ask = FALSE, echo = FALSE) # loads mpdf
-SpatialMultiPoints:
-                                                                                   geometry
-1                                                MULTIPOINT (9.38 11.5,11.1 9.85,9.76 11.2)
-2                     MULTIPOINT (10.4 -0.583,10.5 -0.313,9.8 -1.05,10.3 -0.719,11.4 -1.05)
-3 MULTIPOINT (-0.844 9.18,1.14 10.8,1.95 10.8,-0.451 10.7,0.67 10.3,0.127 10.5,-0.727 9.23)
-Coordinate Reference System (CRS) arguments: NA 
-Warning message:
-In data.row.names(row.names, rowsi, i) :
-  some row.names duplicated: 2,3,5,6,7,8,10,11,12,13,14,15 --> row.names NOT used
+> # example(SpatialMultiPoints, ask = FALSE, echo = FALSE) # loads mpdf
+> cl1 = cbind(rnorm(3, 10), rnorm(3, 10))
+> cl2 = cbind(rnorm(5, 10), rnorm(5,  0))
+> cl3 = cbind(rnorm(7,  0), rnorm(7, 10))
+> mpdf = SpatialMultiPointsDataFrame(list(cl1, cl2, cl3), data.frame(a = 1:3))
 > m = st_as_sf(mpdf)
 > all.equal(as(m, "Spatial"), mpdf) # TRUE
 [1] TRUE
 > 
 > demo(meuse, ask = FALSE, echo = FALSE)
-> meuse = spTransform(meuse, CRS("+init=epsg:4326"))
+> meuse = spTransform(meuse, CRS("+proj=longlat +ellps=WGS84 +no_defs"))
 > pol.grd = as(meuse.grid, "SpatialPolygonsDataFrame")
-> meuse.grd = spTransform(meuse.grid, CRS("+init=epsg:4326"))
+> meuse.grd = spTransform(meuse.grid, CRS("+proj=longlat +ellps=WGS84 +no_defs"))
 Warning message:
-In spTransform(meuse.grid, CRS("+init=epsg:4326")) :
+In spTransform(meuse.grid, CRS("+proj=longlat +ellps=WGS84 +no_defs")) :
   Grid warping not available, coercing to points
-> pol.grd = spTransform(pol.grd, CRS("+init=epsg:4326"))
-> meuse.area = spTransform(meuse.area, CRS("+init=epsg:4326"))
-> meuse.riv = spTransform(meuse.riv, CRS("+init=epsg:4326"))
+> pol.grd = spTransform(pol.grd, CRS("+proj=longlat +ellps=WGS84 +no_defs"))
+> meuse.area = spTransform(meuse.area, CRS("+proj=longlat +ellps=WGS84 +no_defs"))
+> meuse.riv = spTransform(meuse.riv, CRS("+proj=longlat +ellps=WGS84 +no_defs"))
 > summary(st_as_sf(meuse))
     cadmium           copper            lead            zinc       
  Min.   : 0.200   Min.   : 14.00   Min.   : 37.0   Min.   : 113.0  
@@ -92,7 +88,7 @@ In spTransform(meuse.grid, CRS("+init=epsg:4326")) :
                                     NA's   :2                             
     landuse       dist.m                geometry  
  W      :50   Min.   :  10.0   POINT        :155  
- Ah     :39   1st Qu.:  80.0   epsg:4326    :  0  
+ Ah     :39   1st Qu.:  80.0   epsg:NA      :  0  
  Am     :22   Median : 270.0   +proj=long...:  0  
  Fw     :10   Mean   : 290.3                      
  Ab     : 8   3rd Qu.: 450.0                      
@@ -108,26 +104,29 @@ In spTransform(meuse.grid, CRS("+init=epsg:4326")) :
  Max.   :1.0000   Max.   :1.0000   Max.   :0.9926                    
           geometry   
  POINT        :3103  
- epsg:4326    :   0  
+ epsg:NA      :   0  
  +proj=long...:   0  
                      
                      
                      
 > x <- st_as_sf(meuse.grid) # don't print: CRS variations.
+Warning message:
+In make_crs(x) :
+  the following proj4string elements are ignored: +proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +no_defs ; remove the +init=epsg:XXXX to undo this
 > summary(st_as_sf(meuse.area))
           geometry
  POLYGON      :1  
- epsg:4326    :0  
+ epsg:NA      :0  
  +proj=long...:0  
 > summary(st_as_sf(meuse.riv))
           geometry
  POLYGON      :1  
- epsg:4326    :0  
+ epsg:NA      :0  
  +proj=long...:0  
 > summary(st_as_sf(as(meuse.riv, "SpatialLines")))
           geometry
  LINESTRING   :1  
- epsg:4326    :0  
+ epsg:NA      :0  
  +proj=long...:0  
 > summary(st_as_sf(pol.grd))
      part.a           part.b            dist        soil     ffreq   
@@ -139,7 +138,7 @@ In spTransform(meuse.grid, CRS("+init=epsg:4326")) :
  Max.   :1.0000   Max.   :1.0000   Max.   :0.9926                    
           geometry   
  POLYGON      :3103  
- epsg:4326    :   0  
+ epsg:NA      :   0  
  +proj=long...:   0  
                      
                      
@@ -154,30 +153,28 @@ In spTransform(meuse.grid, CRS("+init=epsg:4326")) :
  Max.   :1.0000   Max.   :1.0000   Max.   :0.9926                    
           geometry   
  LINESTRING   :3103  
- epsg:4326    :   0  
+ epsg:NA      :   0  
  +proj=long...:   0  
                      
                      
                      
 > 
-> # roundtrip nc: sf -> sp -> sf
-> # nc = st_read(system.file("gpkg/nc.gpkg", package="sf"), "nc.gpkg")
-> nc = st_read(system.file("shape/nc.shp", package="sf"), "nc", quiet = TRUE)
-> p4s = "+proj=longlat +datum=NAD27 +no_defs +ellps=clrk66 +nadgrids=@conus,@alaska,@ntv2_0.gsb,@ntv1_can.dat"
-> suppressWarnings(st_crs(nc) <- p4s)
-> names(nc)[15] = "geometry"
-> attr(nc, "sf_column") = "geometry"
-> attr(nc$geometry, "crs")$epsg = NA_integer_
+> nc = st_read(system.file("gpkg/nc.gpkg", package="sf"), "nc.gpkg")
+Reading layer `nc.gpkg' from data source `/home/edzer/git/sf.Rcheck/sf/gpkg/nc.gpkg' using driver `GPKG'
+Simple feature collection with 100 features and 14 fields
+geometry type:  MULTIPOLYGON
+dimension:      XY
+bbox:           xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+geographic CRS: NAD27
 > all.equal(nc, st_as_sf(as(nc, "Spatial")))
+[1] "Names: 1 string mismatch"                                  
+[2] "Attributes: < Component \"sf_column\": 1 string mismatch >"
+> st_crs(nc) == st_crs(st_as_sf(as(nc, "Spatial")))
 [1] TRUE
 > 
-> sp = as(nc, "Spatial")
-> comment(sp) = "FALSE"
-> all.equal(nc, st_as_sf(sp))
-[1] TRUE
 > detach("package:sp")
 > unloadNamespace("rgeos")
 > 
 > proc.time()
    user  system elapsed 
-  4.512   0.224   4.543 
+  2.525   0.043   2.560 

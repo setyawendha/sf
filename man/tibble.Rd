@@ -3,13 +3,15 @@
 \name{tibble}
 \alias{tibble}
 \alias{type_sum.sfc}
-\alias{tibble}
 \alias{obj_sum.sfc}
+\alias{pillar_shaft.sfc}
 \title{Summarize simple feature type for tibble}
 \usage{
 type_sum.sfc(x, ...)
 
 obj_sum.sfc(x)
+
+pillar_shaft.sfc(x, ...)
 }
 \arguments{
 \item{x}{object of class sfc}
@@ -20,4 +22,7 @@ obj_sum.sfc(x)
 Summarize simple feature type for tibble
 
 Summarize simple feature item for tibble
+}
+\details{
+see \link[pillar]{type_sum}
 }

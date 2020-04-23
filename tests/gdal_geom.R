@@ -18,7 +18,9 @@ x = st_boundary(nc)
 
 x = st_convex_hull(nc)
 
-x = st_simplify(nc_tr, 1e4)
+x = st_simplify(nc_tr, dTolerance = 1e4)
+
+x = st_simplify(nc_tr, preserveTopology = TRUE)
 
 if (sf:::CPL_geos_version() >= "3.4.0")
 	x = st_triangulate(nc_tr)
@@ -55,7 +57,7 @@ x = st_sym_difference(a[1,], b)
 x = st_sym_difference(a, st_union(b))
 
 x = st_drivers()
-cat(paste("GDAL has", nrow(x), "drivers\n"))
+#cat(paste("GDAL has", nrow(x), "drivers\n"))
 
 # GEOS ops:
 
@@ -85,11 +87,13 @@ st_equals_exact(a, b, 0.01)
 
 st_geometry_type(st_sfc(st_point(1:2), st_linestring(matrix(1:4,2,2))))
 
+st_geometry_type(st_sfc(st_point(1:2), st_linestring(matrix(1:4,2,2))), by_geometry = FALSE)
+
 st_zm(list(st_point(1:3), st_linestring(matrix(1:6,2,3))))
 
 st_zm(list(st_point(1:2), st_linestring(matrix(1:6,3,2))), add = TRUE, "Z")
 
-st_transform(st_sfc(st_point(c(0,0)), crs=4326), st_crs("+proj=geocent"))
+st_transform(st_sfc(st_point(c(0,0)), crs=4326), st_crs("+proj=geocent"))[[1]]
 
 cbind(st_area(nc_tr[1:5,]), a$AREA)
 
@@ -112,11 +116,11 @@ sfc = st_sfc(p1, p2)
 try(st_buffer(sfc, units::set_units(1000, km))) # error: no crs
 sfc = st_sfc(p1, p2, crs = 4326)
 try(st_buffer(sfc, units::set_units(1000, km))) # error: wrong units
-if (version$os == "linux-gnu") { # why does this break on windows - degree symbol?
-  print(st_buffer(sfc, units::set_units(0.1, rad)))      # OK: will convert to arc_degrees
+if (version$os == "linux-gnu") { # FIXME: why does this break on windows - degree symbol?
+  x = st_buffer(sfc, units::set_units(0.1, rad))      # OK: will convert to arc_degrees
 }
 x = st_transform(sfc, 3857)
-st_buffer(x, units::set_units(1000, km)) # success
+x = st_buffer(x, units::set_units(1000, km)) # success
 
 cr = st_as_sfc("CIRCULARSTRING(0 0,1 0,1 1)")
 cr1 = st_sf(a = 1, geometry = cr)
@@ -135,3 +139,10 @@ is.na(st_bbox(ls))
 mp = st_combine(st_buffer(st_sfc(lapply(1:3, function(x) st_point(c(x,x)))), 0.2 * 1:3))
 plot(st_centroid(mp), add = TRUE, col = 'red') # centroid of combined geometry
 plot(st_centroid(mp, of_largest_polygon = TRUE), add = TRUE, col = 'blue', pch = 3) # center of largest sub-polygon
+
+x = st_sfc(st_polygon(list(rbind(c(0,0),c(0.5,0),c(0.5,0.5),c(0.5,0),c(1,0),c(1,1),c(0,1),c(0,0)))))
+suppressWarnings(st_is_valid(x))
+y = st_make_valid(x)
+y = st_make_valid(x[[1]])
+y = st_make_valid(st_sf(a = 1, geom = x))
+st_is_valid(y)

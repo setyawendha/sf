@@ -3,22 +3,34 @@
 \name{geos_binary_ops}
 \alias{geos_binary_ops}
 \alias{st_intersection}
-\alias{geos_binary_ops}
+\alias{st_intersection.sfc}
+\alias{st_intersection.sf}
 \alias{st_difference}
-\alias{geos_binary_ops}
+\alias{st_difference.sfc}
 \alias{st_sym_difference}
+\alias{st_snap}
 \title{Geometric operations on pairs of simple feature geometry sets}
 \usage{
 st_intersection(x, y)
 
+\method{st_intersection}{sfc}(x, y)
+
+\method{st_intersection}{sf}(x, y)
+
 st_difference(x, y)
 
+\method{st_difference}{sfc}(x, y)
+
 st_sym_difference(x, y)
+
+st_snap(x, y, tolerance)
 }
 \arguments{
 \item{x}{object of class \code{sf}, \code{sfc} or \code{sfg}}
 
 \item{y}{object of class \code{sf}, \code{sfc} or \code{sfg}}
+
+\item{tolerance}{tolerance values used for \code{st_snap}; numeric value or object of class \code{units}; may have tolerance values for each feature in \code{x}}
 }
 \value{
 The intersection, difference or symmetric difference between two sets of geometries.
@@ -29,8 +41,47 @@ Perform geometric set operations with simple feature geometry collections
 }
 \details{
 A spatial index is built on argument \code{x}; see \url{http://r-spatial.org/r/2017/06/22/spatial-index.html}. The reference for the STR tree algorithm is: Leutenegger, Scott T., Mario A. Lopez, and Jeffrey Edgington. "STR: A simple and efficient algorithm for R-tree packing." Data Engineering, 1997. Proceedings. 13th international conference on. IEEE, 1997. For the pdf, search Google Scholar.
+
+When called with missing \code{y}, the \code{sfc} method for \code{st_intersection} returns all non-empty intersections of the geometries of \code{x}; an attribute \code{idx} contains a list-column with the indexes of contributing geometries.
+
+when called with a missing \code{y}, the \code{sf} method for \code{st_intersection} returns an \code{sf} object with attributes taken from the contributing feature with lowest index; two fields are added: \code{n.overlaps} with the number of overlapping features in \code{x}, and a list-column \code{origins} with indexes of all overlapping features.
+
+When \code{st_difference} is called with a single argument,
+overlapping areas are erased from geometries that are indexed at greater
+numbers in the argument to \code{x}; geometries that are empty
+or contained fully inside geometries with higher priority are removed entirely.
+The \code{st_difference.sfc} method with a single argument returns an object with
+an \code{"idx"} attribute with the orginal index for returned geometries.
+}
+\note{
+To find whether pairs of simple feature geometries intersect, use
+the function \code{\link{st_intersects}} instead of \code{st_intersection}.
 }
 \examples{
+set.seed(131)
+library(sf)
+m = rbind(c(0,0), c(1,0), c(1,1), c(0,1), c(0,0))
+p = st_polygon(list(m))
+n = 100
+l = vector("list", n)
+for (i in 1:n)
+  l[[i]] = p + 10 * runif(2)
+s = st_sfc(l)
+plot(s, col = sf.colors(categorical = TRUE, alpha = .5))
+title("overlapping squares")
+d = st_difference(s) # sequential differences: s1, s2-s1, s3-s2-s1, ...
+plot(d, col = sf.colors(categorical = TRUE, alpha = .5))
+title("non-overlapping differences")
+i = st_intersection(s) # all intersections
+plot(i, col = sf.colors(categorical = TRUE, alpha = .5))
+title("non-overlapping intersections")
+summary(lengths(st_overlaps(s, s))) # includes self-counts!
+summary(lengths(st_overlaps(d, d)))
+summary(lengths(st_overlaps(i, i)))
+sf = st_sf(s)
+i = st_intersection(sf) # all intersections
+plot(i["n.overlaps"])
+summary(i$n.overlaps - lengths(i$origins))
 # A helper function that erases all of y from x:
 st_erase = function(x, y) st_difference(x, st_union(st_combine(y)))
 }

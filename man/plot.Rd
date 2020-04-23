@@ -3,88 +3,191 @@
 \name{plot}
 \alias{plot}
 \alias{plot.sf}
-\alias{plot}
+\alias{get_key_pos}
 \alias{plot.sfc_POINT}
-\alias{plot}
 \alias{plot.sfc_MULTIPOINT}
-\alias{plot}
 \alias{plot.sfc_LINESTRING}
-\alias{plot}
 \alias{plot.sfc_CIRCULARSTRING}
-\alias{plot}
 \alias{plot.sfc_MULTILINESTRING}
-\alias{plot}
 \alias{plot.sfc_POLYGON}
-\alias{plot}
 \alias{plot.sfc_MULTIPOLYGON}
-\alias{plot}
 \alias{plot.sfc_GEOMETRYCOLLECTION}
-\alias{plot}
 \alias{plot.sfc_GEOMETRY}
-\alias{plot}
 \alias{plot.sfg}
-\alias{plot}
 \alias{plot_sf}
-\alias{plot}
 \alias{sf.colors}
-\title{Plot sf object}
+\title{plot sf object}
 \usage{
-\method{plot}{sf}(x, y, ..., ncol = 10, col = NULL, max.plot = 9, main)
+\method{plot}{sf}(
+  x,
+  y,
+  ...,
+  main,
+  pal = NULL,
+  nbreaks = 10,
+  breaks = "pretty",
+  max.plot = if (is.null(n <- options("sf_max.plot")[[1]])) 9 else n,
+  key.pos = get_key_pos(x, ...),
+  key.length = 0.618,
+  key.width = lcm(1.8),
+  reset = TRUE,
+  logz = FALSE,
+  extent = x,
+  xlim = st_bbox(extent)[c(1, 3)],
+  ylim = st_bbox(extent)[c(2, 4)]
+)
 
-\method{plot}{sfc_POINT}(x, y, ..., pch = 1, cex = 1, col = 1, bg = 0,
-  lwd = 1, lty = 1, type = "p", add = FALSE)
+get_key_pos(x, ...)
 
-\method{plot}{sfc_MULTIPOINT}(x, y, ..., pch = 1, cex = 1, col = 1,
-  bg = 0, lwd = 1, lty = 1, type = "p", add = FALSE)
+\method{plot}{sfc_POINT}(
+  x,
+  y,
+  ...,
+  pch = 1,
+  cex = 1,
+  col = 1,
+  bg = 0,
+  lwd = 1,
+  lty = 1,
+  type = "p",
+  add = FALSE
+)
 
-\method{plot}{sfc_LINESTRING}(x, y, ..., lty = 1, lwd = 1, col = 1,
-  pch = 1, type = "l", add = FALSE)
+\method{plot}{sfc_MULTIPOINT}(
+  x,
+  y,
+  ...,
+  pch = 1,
+  cex = 1,
+  col = 1,
+  bg = 0,
+  lwd = 1,
+  lty = 1,
+  type = "p",
+  add = FALSE
+)
+
+\method{plot}{sfc_LINESTRING}(x, y, ..., lty = 1, lwd = 1, col = 1, pch = 1, type = "l", add = FALSE)
 
 \method{plot}{sfc_CIRCULARSTRING}(x, y, ...)
 
-\method{plot}{sfc_MULTILINESTRING}(x, y, ..., lty = 1, lwd = 1, col = 1,
-  pch = 1, type = "l", add = FALSE)
+\method{plot}{sfc_MULTILINESTRING}(x, y, ..., lty = 1, lwd = 1, col = 1, pch = 1, type = "l", add = FALSE)
 
-\method{plot}{sfc_POLYGON}(x, y, ..., lty = 1, lwd = 1, col = NA,
-  cex = 1, pch = NA, border = 1, add = FALSE, rule = "winding")
+\method{plot}{sfc_POLYGON}(
+  x,
+  y,
+  ...,
+  lty = 1,
+  lwd = 1,
+  col = NA,
+  cex = 1,
+  pch = NA,
+  border = 1,
+  add = FALSE,
+  rule = "evenodd"
+)
 
-\method{plot}{sfc_MULTIPOLYGON}(x, y, ..., lty = 1, lwd = 1, col = NA,
-  border = 1, add = FALSE, rule = "winding")
+\method{plot}{sfc_MULTIPOLYGON}(
+  x,
+  y,
+  ...,
+  lty = 1,
+  lwd = 1,
+  col = NA,
+  border = 1,
+  add = FALSE,
+  rule = "evenodd"
+)
 
-\method{plot}{sfc_GEOMETRYCOLLECTION}(x, y, ..., pch = 1, cex = 1, bg = 0,
-  lty = 1, lwd = 1, col = 1, border = 1, add = FALSE)
+\method{plot}{sfc_GEOMETRYCOLLECTION}(
+  x,
+  y,
+  ...,
+  pch = 1,
+  cex = 1,
+  bg = 0,
+  lty = 1,
+  lwd = 1,
+  col = 1,
+  border = 1,
+  add = FALSE
+)
 
-\method{plot}{sfc_GEOMETRY}(x, y, ..., pch = 1, cex = 1, bg = 0,
-  lty = 1, lwd = 1, col = 1, border = 1, add = FALSE)
+\method{plot}{sfc_GEOMETRY}(
+  x,
+  y,
+  ...,
+  pch = 1,
+  cex = 1,
+  bg = 0,
+  lty = 1,
+  lwd = 1,
+  col = ifelse(st_dimension(x) == 2, NA, 1),
+  border = 1,
+  add = FALSE
+)
 
 \method{plot}{sfg}(x, ...)
 
-plot_sf(x, xlim = NULL, ylim = NULL, asp = NA, axes = FALSE,
-  bgc = par("bg"), ..., xaxs, yaxs, lab, setParUsrBB = FALSE,
-  bgMap = NULL, expandBB = c(0, 0, 0, 0), graticule = NA_crs_,
-  col_graticule = "grey")
+plot_sf(
+  x,
+  xlim = NULL,
+  ylim = NULL,
+  asp = NA,
+  axes = FALSE,
+  bgc = par("bg"),
+  ...,
+  xaxs,
+  yaxs,
+  lab,
+  setParUsrBB = FALSE,
+  bgMap = NULL,
+  expandBB = c(0, 0, 0, 0),
+  graticule = NA_crs_,
+  col_graticule = "grey",
+  border
+)
 
-sf.colors(n = 10, xc, cutoff.tails = c(0.35, 0.2), alpha = 1,
-  categorical = FALSE)
+sf.colors(n = 10, cutoff.tails = c(0.35, 0.2), alpha = 1, categorical = FALSE)
 }
 \arguments{
 \item{x}{object of class sf}
 
 \item{y}{ignored}
 
-\item{...}{further specifications, see \link{plot_sf} and \link{plot}}
-
-\item{ncol}{integer; default number of colors to be used}
-
-\item{col}{color}
-
-\item{max.plot}{integer; lower boundary to maximum number of attributes to plot (defaults to 9)}
+\item{...}{further specifications, see \link{plot_sf} and \link{plot} and details.}
 
 \item{main}{title for plot (\code{NULL} to remove)}
+
+\item{pal}{palette function, similar to \link[grDevices]{rainbow}, or palette values; if omitted, \code{sf.colors} is used}
+
+\item{nbreaks}{number of colors breaks (ignored for \code{factor} or \code{character} variables)}
+
+\item{breaks}{either a numeric vector with the actual breaks, or a name of a method accepted by the \code{style} argument of \link[classInt]{classIntervals}}
+
+\item{max.plot}{integer; lower boundary to maximum number of attributes to plot; the default value (9) can be overriden by setting the global option \code{sf_max.plot}, e.g. \code{options(sf_max.plot=2)}}
+
+\item{key.pos}{integer; side to plot a color key: 1 bottom, 2 left, 3 top, 4 right; set to \code{NULL} to omit key, or -1 to select automatically. If multiple columns are plotted in a single function call by default no key is plotted and every submap is stretched individually; if a key is requested (and \code{col} is missing) all maps are colored according to a single key. Auto select depends on plot size, map aspect, and, if set, parameter \code{asp}.}
+
+\item{key.length}{amount of space reserved for the key along its axis, length of the scale bar}
+
+\item{key.width}{amount of space reserved for the key (incl. labels), thickness/width of the scale bar}
+
+\item{reset}{logical; if \code{FALSE}, keep the plot in a mode that allows adding further map elements; if \code{TRUE} restore original mode after plotting \code{sf} objects with attributes; see details.}
+
+\item{logz}{logical; if \code{TRUE}, use log10-scale for the attribute variable. In that case, \code{breaks} and \code{at} need to be given as log10-values; see examples.}
+
+\item{extent}{object with an \code{st_bbox} method to define plot extent; defaults to \code{x}}
+
+\item{xlim}{see \link{plot.window}}
+
+\item{ylim}{see \link{plot.window}}
 
 \item{pch}{plotting symbol}
 
 \item{cex}{symbol size}
+
+\item{col}{color for plotting features; if \code{length(col)} does not equal 1 or \code{nrow(x)}, a warning is emitted that colors will be recycled. Specifying \code{col} suppresses plotting the legend key.}
 
 \item{bg}{symbol background color}
 
@@ -94,15 +197,11 @@ sf.colors(n = 10, xc, cutoff.tails = c(0.35, 0.2), alpha = 1,
 
 \item{type}{plot type: 'p' for points, 'l' for lines, 'b' for both}
 
-\item{add}{logical; add to current plot?}
+\item{add}{logical; add to current plot? Note that when using \code{add=TRUE}, you may have to set \code{reset=FALSE} in the first plot command.}
 
-\item{border}{color of polygon border}
+\item{border}{color of polygon border(s)}
 
-\item{rule}{see \link[graphics]{polypath}}
-
-\item{xlim}{see \link{plot.window}}
-
-\item{ylim}{see \link{plot.window}}
+\item{rule}{see \link[graphics]{polypath}; for \code{winding}, exterior ring direction should be opposite that of the holes; with \code{evenodd}, plotting is robust against misspecified ring directions}
 
 \item{asp}{see below, and see \link{par}}
 
@@ -130,26 +229,28 @@ or object returned by \link{st_graticule}}
 
 \item{n}{integer; number of colors}
 
-\item{xc}{factor or numeric vector, for which colors need to be returned}
-
 \item{cutoff.tails}{numeric, in [0,0.5] start and end values}
 
 \item{alpha}{numeric, in [0,1], transparency}
 
-\item{categorical}{logical; should a categorical color ramp be returned? if \code{x} is a factor, yes.}
+\item{categorical}{logical; do we want colors for a categorical variable? (see details)}
 }
 \description{
+plot one or more attributes of an sf object on a map
 Plot sf object
-
-blue-pink-yellow color scale
 }
 \details{
 \code{plot.sf} maximally plots \code{max.plot} maps with colors following from attribute columns,
-one map per attribute. It uses \code{sf.colors} for default colors. For more control over individual maps,
-set parameter \code{mfrow} with \code{par} prior to plotting,  and plot single maps one by one.
+one map per attribute. It uses \code{sf.colors} for default colors. For more control over placement of individual maps,
+set parameter \code{mfrow} with \link{par} prior to plotting, and plot single maps one by one; note that this only works
+in combination with setting parameters \code{key.pos=NULL} (no legend) and \code{reset=FALSE}.
 
 \code{plot.sfc} plots the geometry, additional parameters can be passed on
 to control color, lines or symbols.
+
+When setting \code{reset} to \code{FALSE}, the original device parameters are lost, and the device must be reset using \code{dev.off()} in order to reset it.
+
+parameter \code{at} can be set to specify where labels are placed along the key; see examples.
 
 \code{plot_sf} sets up the plotting area, axes, graticule, or webmap background; it
 is called by all \code{plot} methods before anything is drawn.
@@ -158,68 +259,32 @@ The argument \code{setParUsrBB} may be used to pass the logical value \code{TRUE
 
 The default aspect for map plots is 1; if however data are not
 projected (coordinates are long/lat), the aspect is by default set to
-1/cos(My * pi)/180) with My the y coordinate of the middle of the map
+1/cos(My * pi/180) with My the y coordinate of the middle of the map
 (the mean of \code{ylim}, which defaults to the y range of bounding box). This
 implies an \href{https://en.wikipedia.org/wiki/Equirectangular_projection}{Equirectangular projection}.
 
-\code{sf.colors} was taken from \link[sp]{bpy.colors}, with modified \code{cutoff.tails} defaults; for categorical, colors were taken from \url{http://www.colorbrewer2.org/} (if n < 9, Set2, else Set3).
+non-categorical colors from \code{sf.colors} were taken from \link[sp]{bpy.colors}, with modified \code{cutoff.tails} defaults
+If categorical is \code{TRUE}, default colors are from \url{http://www.colorbrewer2.org/} (if n < 9, Set2, else Set3).
 }
 \examples{
-# plot linestrings:
-l1 = st_linestring(matrix(runif(6)-0.5,,2))
-l2 = st_linestring(matrix(runif(6)-0.5,,2))
-l3 = st_linestring(matrix(runif(6)-0.5,,2))
-s = st_sf(a=2:4, b=st_sfc(l1,l2,l3))
-plot(s, col = s$a, axes = FALSE)
-plot(s, col = s$a)
-ll = "+init=epsg:4326 +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-st_crs(s) = ll
-plot(s, col = s$a, axes = TRUE)
-plot(s, col = s$a, lty = s$a, lwd = s$a, pch = s$a, type = 'b')
-l4 = st_linestring(matrix(runif(6),,2))
-plot(st_sf(a=1,b=st_sfc(l4)), add = TRUE)
-# plot multilinestrings:
-ml1 = st_multilinestring(list(l1, l2))
-ml2 = st_multilinestring(list(l3, l4))
-ml = st_sf(a = 2:3, b = st_sfc(ml1, ml2))
-plot(ml, col = ml$a, lty = ml$a, lwd = ml$a, pch = ml$a, type = 'b')
-# plot points:
-p1 = st_point(c(1,2))
-p2 = st_point(c(3,3))
-p3 = st_point(c(3,0))
-p = st_sf(a=2:4, b=st_sfc(p1,p2,p3))
-plot(p, col = s$a, axes = TRUE)
-plot(p, col = s$a)
-plot(p, col = p$a, pch = p$a, cex = p$a, bg = s$a, lwd = 2, lty = 2, type = 'b')
-p4 = st_point(c(2,2))
-plot(st_sf(a=1, st_sfc(p4)), add = TRUE)
-# multipoints:
-mp1 = st_multipoint(matrix(1:4,2))
-mp2 = st_multipoint(matrix(5:8,2))
-mp = st_sf(a = 2:3, b = st_sfc(mp1, mp2))
-plot(mp)
-plot(mp, col = mp$a, pch = mp$a, cex = mp$a, bg = mp$a, lwd = mp$a, lty = mp$a, type = 'b')
-# polygon:
-outer = matrix(c(0,0,10,0,10,10,0,10,0,0),ncol=2, byrow=TRUE)
-hole1 = matrix(c(1,1,1,2,2,2,2,1,1,1),ncol=2, byrow=TRUE)
-hole2 = matrix(c(5,5,5,6,6,6,6,5,5,5),ncol=2, byrow=TRUE)
-pl1 = st_polygon(list(outer, hole1, hole2))
-pl2 = st_polygon(list(outer+10, hole1+10, hole2+10))
-po = st_sf(a = 2:3, st_sfc(pl1,pl2))
-plot(po, col = po$a, border = rev(po$a), lwd=3)
-# multipolygon
-r10 = matrix(rep(c(0,10),each=5),5)
-pl1 = list(outer, hole1, hole2)
-pl2 = list(outer+10, hole1+10, hole2+10)
-pl3 = list(outer+r10, hole1+r10, hole2+r10)
-mpo1 = st_multipolygon(list(pl1,pl2))
-mpo2 = st_multipolygon(list(pl3))
-mpo = st_sf(a=2:3, b=st_sfc(mpo1,mpo2))
-plot(mpo, col = mpo$a, border = rev(mpo$a), lwd = 2)
-# geometrycollection:
-gc1 = st_geometrycollection(list(mpo1, st_point(c(21,21)), l1 * 2 + 21))
-gc2 = st_geometrycollection(list(mpo2, l2 - 2, l3 - 2, st_point(c(-1,-1))))
-gc = st_sf(a=2:3, b = st_sfc(gc1,gc2))
-plot(gc, cex = gc$a, col = gc$a, border = rev(gc$a) + 2, lwd = 2)
+nc = st_read(system.file("gpkg/nc.gpkg", package="sf"), quiet = TRUE)
+# plot single attribute, auto-legend:
+plot(nc["SID74"])
+# plot multiple:
+plot(nc[c("SID74", "SID79")]) # better use ggplot2::geom_sf to facet and get a single legend!
+# adding to a plot of an sf object only works when using reset=FALSE in the first plot:
+plot(nc["SID74"], reset = FALSE)
+plot(st_centroid(st_geometry(nc)), add = TRUE)
+# log10 z-scale:
+plot(nc["SID74"], logz = TRUE, breaks = c(0,.5,1,1.5,2), at = c(0,.5,1,1.5,2))
+# and we need to reset the plotting device after that, e.g. by
+layout(1)
+# when plotting only geometries, the reset=FALSE is not needed:
+plot(st_geometry(nc))
+plot(st_geometry(nc)[1], col = 'red', add = TRUE)
+# add a custom legend to an arbitray plot:
+layout(matrix(1:2, ncol = 2), widths = c(1, lcm(2)))
+plot(1)
+.image_scale(1:10, col = sf.colors(9), key.length = lcm(8), key.pos = 4, at = 1:10)
 sf.colors(10)
 }

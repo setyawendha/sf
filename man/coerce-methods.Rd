@@ -3,31 +3,55 @@
 \name{as}
 \alias{as}
 \alias{coerce,Spatial,sf-method}
+<<<<<<< HEAD
 \alias{as}
 \alias{coerce,Spatial,sfc-method}
 \alias{as}
 \alias{coerce,sf,Spatial-method}
 \alias{as}
+=======
+\alias{coerce,Spatial,sfc-method}
+\alias{coerce,sf,Spatial-method}
+>>>>>>> master
 \alias{coerce,sfc,Spatial-method}
 \alias{as_Spatial}
-\title{Methods to coerce simple feature geometries to corresponding \code{Spatial*} objects}
+\alias{coerce,crs,CRS-method}
+\title{Methods to coerce simple features to \verb{Spatial*} and \code{Spatial*DataFrame} objects}
 \usage{
 as_Spatial(from, cast = TRUE, IDs = paste0("ID", 1:length(from)))
 }
 \arguments{
-\item{from}{object of class \code{sfc_POINT}, \code{sfc_MULTIPOINT}, \code{sfc_LINESTRING}, \code{sfc_MULTILINESTRING}, \code{sfc_POLYGON}, or \code{sfc_MULTIPOLYGON}.}
+\item{from}{object of class \code{sf}, \code{sfc_POINT}, \code{sfc_MULTIPOINT}, \code{sfc_LINESTRING},
+\code{sfc_MULTILINESTRING}, \code{sfc_POLYGON}, or \code{sfc_MULTIPOLYGON}.}
 
-\item{cast}{logical; if \code{TRUE}, \link{st_cast} \code{from} before converting, so that e.g. \code{GEOMETRY} objects with a mix of \code{POLYGON} and \code{MULTIPOLYGON} are cast to \code{MULTIPOLYGON}.}
+\item{cast}{logical; if \code{TRUE}, \code{\link[=st_cast]{st_cast()}} \code{from} before converting, so that e.g.
+\code{GEOMETRY} objects with a mix of \code{POLYGON} and \code{MULTIPOLYGON} are cast to \code{MULTIPOLYGON}.}
 
-\item{IDs}{character vector with IDs for the \code{Spatial*} geometries}
+\item{IDs}{character vector with IDs for the \verb{Spatial*} geometries}
 }
 \value{
 geometry-only object deriving from \code{Spatial}, of the appropriate class
 }
 \description{
-Methods to coerce simple feature geometries to corresponding \code{Spatial*} objects
+\code{\link[=as_Spatial]{as_Spatial()}} allows to convert \code{sf} and \code{sfc} to \code{Spatial*DataFrame} and
+\verb{Spatial*} for \code{sp} compatibility. You can also use \code{as(x, "Spatial")} To transform
+\code{sp} objects to \code{sf} and \code{sfc} with \code{as(x, "sf")}.
+}
+\details{
+\link[sp:sp]{sp} supports three dimensions for \code{POINT} and \code{MULTIPOINT} (\verb{SpatialPoint*}).
+Other geometries must be two-dimensional (\code{XY}). Dimensions can be dropped using
+\code{\link[=st_zm]{st_zm()}} with \code{what = "M"} or \code{what = "ZM"}.
+
+For converting simple features (i.e., \code{sf} objects) to their \code{Spatial} counterpart, use \code{as(obj, "Spatial")}
 }
 \examples{
-nc = st_read(system.file("shape/nc.shp", package="sf"))
-as_Spatial(st_geometry(nc[1,]))
+nc <- st_read(system.file("shape/nc.shp", package="sf"))
+# convert to SpatialPolygonsDataFrame
+spdf <- as_Spatial(nc)
+# identical to
+spdf <- as(nc, "Spatial")
+# convert to SpatialPolygons
+as(st_geometry(nc), "Spatial")
+# back to sf
+as(spdf, "sf")
 }

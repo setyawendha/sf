@@ -1,6 +1,4 @@
-Rcpp::CharacterVector p4s_from_spatial_reference(OGRSpatialReference *ref);
-Rcpp::List sfc_from_ogr(std::vector<OGRGeometry *>, bool destroy);
-std::vector<OGRGeometry *> ogr_from_sfc(Rcpp::List sfc, OGRSpatialReference **sref);
-std::vector<char *> create_options(Rcpp::CharacterVector lco, bool quiet);
-void handle_error(OGRErr err);
-Rcpp::List get_crs(OGRSpatialReference *ref);
+void set_error_handler(void);
+void unset_error_handler(void);
+OGRSpatialReference *handle_axis_order(OGRSpatialReference *sr);
+Rcpp::List create_crs(const OGRSpatialReference *ref, bool set_input);

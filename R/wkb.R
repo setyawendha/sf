@@ -49,7 +49,7 @@ st_as_sfc.WKB = function(x, ..., EWKB = FALSE, spatialite = FALSE, pureR = FALSE
 	ret = if (pureR)
 			R_read_wkb(x, readWKB, EWKB = EWKB)
 		else
-			CPL_read_wkb(x, EWKB, spatialite, endian = as.integer(.Platform$endian == "little"))
+			CPL_read_wkb(x, EWKB, spatialite)
 	if (is.na(crs) && (EWKB || spatialite) && !is.null(attr(ret, "srid")) && attr(ret, "srid") != 0)
 		crs = attr(ret, "srid")
 	if (! is.na(st_crs(crs))) {
@@ -57,6 +57,14 @@ st_as_sfc.WKB = function(x, ..., EWKB = FALSE, spatialite = FALSE, pureR = FALSE
 		st_sfc(ret, crs = crs)
 	} else
 		st_sfc(ret) # leave attr srid in place: PostGIS srid that is not an EPSG code
+}
+
+#' @export
+#' @examples
+#' st_as_sfc(st_as_binary(st_sfc(st_point(0:1)))[[1]], crs = 4326)
+#' @name st_as_sfc
+st_as_sfc.raw = function(x, ...) {
+	st_as_sfc(structure(list(x), class = "WKB"), ...)
 }
 
 R_read_wkb = function(x, readWKB, EWKB = EWKB) {
@@ -228,13 +236,17 @@ st_as_binary = function(x, ...) UseMethod("st_as_binary")
 #' @param pureR logical; use pure R solution, or C++?
 #' @param precision numeric; if zero, do not modify; to reduce precision: negative values convert to float (4-byte real); positive values convert to round(x*precision)/precision. See details.
 #' @param hex logical; return as (unclassed) hexadecimal encoded character vector?
+#' @param srid integer; override srid (can be used when the srid is unavailable locally).
 #' @details \code{st_as_binary} is called on sfc objects on their way to the GDAL or GEOS libraries, and hence does rounding (if requested) on the fly before e.g. computing spatial predicates like \link{st_intersects}. The examples show a round-trip of an \code{sfc} to and from binary.
 #'
 #' For the precision model used, see also \url{https://locationtech.github.io/jts/javadoc/org/locationtech/jts/geom/PrecisionModel.html}. There, it is written that: ``... to specify 3 decimal places of precision, use a scale factor of 1000. To specify -3 decimal places of precision (i.e. rounding to the nearest 1000), use a scale factor of 0.001.''. Note that ALL coordinates, so also Z or M values (if present) are affected.
 #' @export
 #' @examples
-#' x = st_sfc(st_point(c(1/3, 1/6)), precision = 1000)
-#' st_as_sfc(st_as_binary(x)) # rounds
+#' # examples of setting precision:
+#' st_point(c(1/3, 1/6)) %>% st_sfc(precision = 1000) %>% st_as_binary %>% st_as_sfc
+#' st_point(c(1/3, 1/6)) %>% st_sfc(precision =  100) %>% st_as_binary %>% st_as_sfc
+#' st_point(1e6 * c(1/3, 1/6)) %>% st_sfc(precision = 0.01) %>% st_as_binary %>% st_as_sfc
+#' st_point(1e6 * c(1/3, 1/6)) %>% st_sfc(precision = 0.001) %>% st_as_binary %>% st_as_sfc
 st_as_binary.sfc = function(x, ..., EWKB = FALSE, endian = .Platform$endian, pureR = FALSE,
 		precision = attr(x, "precision"), hex = FALSE) {
 	stopifnot(endian %in% c("big", "little"))
@@ -244,8 +256,8 @@ st_as_binary.sfc = function(x, ..., EWKB = FALSE, endian = .Platform$endian, pur
 		structure(lapply(x, st_as_binary.sfg, EWKB = EWKB, pureR = pureR, endian = endian), class = "WKB")
 	else {
 		stopifnot(endian == .Platform$endian)
-		structure(CPL_write_wkb(x, EWKB, endian == "little", Dimension(x[[1]]), precision),
-				class = "WKB")
+		attr(x, "precision") = precision
+		structure(CPL_write_wkb(x, EWKB), class = "WKB")
 	}
 	if (hex)
 		vapply(ret, CPL_raw_to_hex, "")
@@ -276,11 +288,11 @@ createType = function(x, endian, EWKB = FALSE) {
 #' @name st_as_binary
 #' @export
 st_as_binary.sfg = function(x, ..., endian = .Platform$endian, EWKB = FALSE, pureR = FALSE,
-		hex = FALSE) {
+		hex = FALSE, srid = 0) {
 # if pureR, it's done here, if not, it's done in st_as_binary.sfc
 	stopifnot(endian %in% c("big", "little"))
 	if (! pureR)
-		st_as_binary.sfc(st_sfc(x), endian == endian, EWKB = EWKB, pureR = pureR, hex = hex, ...)[[1]]
+		st_as_binary.sfc(st_sfc(x), endian == endian, EWKB = EWKB, pureR = pureR, hex = hex, srid = srid, ...)[[1]]
 	else {
 		rc <- rawConnection(raw(0), "r+")
 		on.exit(close(rc))

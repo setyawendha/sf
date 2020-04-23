@@ -1,77 +1,98 @@
 check_join = function(x, y) {
 	if (inherits(y, "sf"))
-		stop("y should be a data.frame; for spatial joins, use st_join", .call = FALSE)
+		stop("y should not have class sf; for spatial joins, use st_join", call. = FALSE)
 }
 
-sf_join = function(g, sf_column) {
+sf_join = function(g, sf_column, suffix_x = ".x") {
+	if (!(sf_column %in% names(g))) {
+		sf_column = paste0(sf_column, suffix_x)
+		stopifnot(sf_column %in% names(g))
+	}
+	attr(g[[ sf_column ]], "bbox") = NULL # remove, so that st_sfc() recomputes:
 	g[[ sf_column ]] = st_sfc(g[[ sf_column ]])
-	class(g) = setdiff(class(g), "sf")
-	st_sf(g)
+	st_sf(g, sf_column_name = sf_column)
 }
 
-#' @name dplyr
-#' @export
+#' @name tidyverse
+#' @inheritParams dplyr::inner_join
 inner_join.sf = function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), ...) {
 	check_join(x, y)
-	sf_join(NextMethod(), attr(x, "sf_column"))
+	class(x) = setdiff(class(x), "sf")
+	sf_join(NextMethod(), attr(x, "sf_column"), suffix[1])
 }
 
-#' @name dplyr
-#' @param x see \link[dplyr]{left_join}
-#' @param y see \link[dplyr]{left_join}
-#' @param by see \link[dplyr]{left_join}
-#' @param copy see \link[dplyr]{left_join}
-#' @param suffix see \link[dplyr]{left_join}
-#' @export
+#' @name tidyverse
 left_join.sf = function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), ...) {
 	check_join(x, y)
-	sf_join(NextMethod(), attr(x, "sf_column"))
+	class(x) = setdiff(class(x), "sf")
+	sf_join(NextMethod(), attr(x, "sf_column"), suffix[1])
 }
 
-#' @name dplyr
-#' @export
+#' @name tidyverse
 right_join.sf = function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), ...) {
 	check_join(x, y)
-	sf_join(NextMethod(), attr(x, "sf_column"))
+	class(x) = setdiff(class(x), "sf")
+	sf_join(NextMethod(), attr(x, "sf_column"), suffix[1])
 }
 
-#' @name dplyr
-#' @export
+#' @name tidyverse
 full_join.sf = function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), ...) {
 	check_join(x, y)
-	sf_join(NextMethod(), attr(x, "sf_column"))
+	class(x) = setdiff(class(x), "sf")
+	sf_join(NextMethod(), attr(x, "sf_column"), suffix[1])
 }
 
-#' @name dplyr
-#' @export
-semi_join.sf = function(x, y, by = NULL, copy = FALSE, ...) {
+#' @name tidyverse
+semi_join.sf = function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), ...) {
 	check_join(x, y)
-	sf_join(NextMethod(), attr(x, "sf_column"))
+	class(x) = setdiff(class(x), "sf")
+	sf_join(NextMethod(), attr(x, "sf_column"), suffix[1])
 }
 
-#' @name dplyr
-#' @export
-anti_join.sf = function(x, y, by = NULL, copy = FALSE, ...) {
+#' @name tidyverse
+anti_join.sf = function(x, y, by = NULL, copy = FALSE, suffix = c(".x", ".y"), ...) {
 	check_join(x, y)
-	sf_join(NextMethod(), attr(x, "sf_column"))
+	class(x) = setdiff(class(x), "sf")
+	sf_join(NextMethod(), attr(x, "sf_column"), suffix[1])
 }
 
 
-#' spatial left or inner join
+#' spatial join, spatial filter
 #'
-#' spatial left or inner join
+#' spatial join, spatial filter
+#' @name st_join
+#' @export
+st_join = function(x, y, join, ...) UseMethod("st_join")
+
+#' @name st_join
 #' @param x object of class \code{sf}
 #' @param y object of class \code{sf}
 #' @param join geometry predicate function with the same profile as \link{st_intersects}; see details
-#' @param FUN deprecated;
 #' @param suffix length 2 character vector; see \link[base]{merge}
-#' @param left logical; if \code{TRUE} carry out left join, else inner join; 
+#' @param ... arguments passed on to the \code{join} or \code{.predicate} function, e.g. \code{prepared}, or a pattern for \link{st_relate}
+#' @param left logical; if \code{TRUE} return the left join, otherwise an inner join; see details.
 #' see also \link[dplyr]{left_join}
-#' @param ... arguments passed on to the \code{join} function (e.g. \code{prepared}, or a pattern for \link{st_relate})
-#' @details alternative values for argument \code{join} are: \link{st_disjoint}
-#' \link{st_touches} \link{st_crosses} \link{st_within} \link{st_contains}
-#' \link{st_overlaps} \link{st_covers} \link{st_covered_by} \link{st_equals} or
-#' \link{st_equals_exact}, or user-defined functions of the same profile
+#' @param largest logical; if \code{TRUE}, return \code{x} features augmented with the fields of \code{y} that have the largest overlap with each of the features of \code{x}; see https://github.com/r-spatial/sf/issues/578
+#' 
+#' @details alternative values for argument \code{join} are:
+#' \itemize{
+#'   \item \link{st_contains_properly}
+#'   \item \link{st_contains}
+#'   \item \link{st_covered_by}
+#'   \item \link{st_covers}
+#'   \item \link{st_crosses}
+#'   \item \link{st_disjoint}
+#'   \item \link{st_equals_exact}
+#'   \item \link{st_equals}
+#'   \item \link{st_is_within_distance}
+#'   \item \link{st_nearest_feature}
+#'   \item \link{st_overlaps}
+#'   \item \link{st_touches}
+#'   \item \link{st_within}
+#'   \item any user-defined function of the same profile as the above
+#' }
+#' A left join returns all records of the \code{x} object with \code{y} fields for non-matched records filled with \code{NA} values; an inner join returns only records that spatially match.
+#' 
 #' @return an object of class \code{sf}, joined based on geometry
 #' @examples
 #' a = st_sf(a = 1:3,
@@ -84,15 +105,39 @@ anti_join.sf = function(x, y, by = NULL, copy = FALSE, ...) {
 #' st_join(a, b) %>% aggregate(list(.$a.x), mean)
 #' library(dplyr)
 #' st_join(a, b) %>% group_by(a.x) %>% summarise(mean(a.y))
+#' # example of largest = TRUE:
+#' nc <- st_transform(st_read(system.file("shape/nc.shp", package="sf")), 2264)                
+#' gr = st_sf(
+#'     label = apply(expand.grid(1:10, LETTERS[10:1])[,2:1], 1, paste0, collapse = " "),
+#'     geom = st_make_grid(st_as_sfc(st_bbox(nc))))
+#' gr$col = sf.colors(10, categorical = TRUE, alpha = .3)
+#' # cut, to check, NA's work out:
+#' gr = gr[-(1:30),]
+#' nc_j <- st_join(nc, gr, largest = TRUE)
+#' # the two datasets:
+#' opar = par(mfrow = c(2,1), mar = rep(0,4))
+#' plot(st_geometry(nc_j))
+#' plot(st_geometry(gr), add = TRUE, col = gr$col)
+#' text(st_coordinates(st_centroid(gr)), labels = gr$label)
+#' # the joined dataset:
+#' plot(st_geometry(nc_j), border = 'black', col = nc_j$col)
+#' text(st_coordinates(st_centroid(nc_j)), labels = nc_j$label, cex = .8)
+#' plot(st_geometry(gr), border = 'green', add = TRUE)
+#' par(opar)
 #' @export
-st_join = function(x, y, join = st_intersects, FUN, suffix = c(".x", ".y"), 
-		left = TRUE, ...) {
-	stopifnot(inherits(x, "sf") && inherits(y, "sf"))
-	if (!missing(FUN)) {
-		.Deprecated("aggregate")
-		stop("for aggregation/summarising after st_join, see examples in ?st_join")
-	}
-	i = join(x, y, ...)
+st_join.sf = function(x, y, join = st_intersects, ..., suffix = c(".x", ".y"), 
+		left = TRUE, largest = FALSE) {
+
+	if (!inherits(y, "sf"))
+		stop("second argument should be of class sf: maybe revert the first two arguments?") # nocov
+
+	i = if (largest) {
+		x$.grp_a = seq_len(nrow(x))
+		y$.grp_b = seq_len(nrow(y))
+		st_intersection(x, y)
+	} else 
+		join(x, y, ...)
+
 	st_geometry(y) = NULL
 	which.x = which(names(x) %in% names(y))
 	which.y = which(names(y) %in% names(x))
@@ -100,12 +145,41 @@ st_join = function(x, y, join = st_intersects, FUN, suffix = c(".x", ".y"),
 		names(x)[which.x] = paste0(names(x)[which.x], suffix[1])
 	if (length(which.y))
 		names(y)[which.y] = paste0(names(y)[which.y], suffix[2])
-	ix = rep(seq_len(nrow(x)), lengths(i))
-	xNAs = seq_len(nrow(x))
-	xNAs[sapply(i, function(x) length(x)==0)] = NA_integer_
-	if (left) { # fill NA y values when no match:
-		i = lapply(i, function(x) { if (length(x) == 0) NA_integer_ else x })
+
+	# create match index ix & i:
+	if (largest) {
+		x$.grp_a = y$.grp_b = NULL # clean up
+		i$.size = if (all(st_dimension(i) < 2)) st_length(i) else st_area(i)
+		l = lapply(split(i, i$.grp_a), function(x) x[which.max(x$.size), ]$.grp_b)
+		ix = as.integer(names(l)) # non-empty x features
+		i = unlist(l) # matching largest y feature
+		if (left) { # fill NA's
+			idx = rep(NA_integer_, nrow(x)) # all x features
+			idx[ix] = i
+			ix = seq_len(nrow(x))
+			i = idx
+		}
+	} else {
+		if (left) # fill NA y values when no match:
+			i = lapply(i, function(x) { if (length(x) == 0) NA_integer_ else x })
 		ix = rep(seq_len(nrow(x)), lengths(i))
 	}
-	st_sf(cbind(as.data.frame(x)[ix,], y[unlist(i), , drop = FALSE]))
+	if (inherits(x, "tbl_df") && requireNamespace("dplyr", quietly = TRUE))
+		st_sf(dplyr::bind_cols(x[ix,], y[unlist(i), , drop = FALSE]))
+  	else
+		st_sf(cbind(as.data.frame(x)[ix,], y[unlist(i), , drop = FALSE]))	
+}
+
+#' @export
+#' @name st_join
+st_filter = function(x, y, ...) UseMethod("st_filter")
+
+#' @export
+#' @name st_join
+#' @param .predicate geometry predicate function with the same profile as \link{st_intersects}; see details
+st_filter.sf = function(x, y, ..., .predicate = st_intersects) {
+	if (!requireNamespace("dplyr", quietly = TRUE))
+		stop("dplyr is not installed: install first?")
+
+    dplyr::filter(x, lengths(.predicate(x, y, ...)) > 0) # will call filter.sf
 }

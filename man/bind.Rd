@@ -3,9 +3,7 @@
 \name{bind}
 \alias{bind}
 \alias{rbind.sf}
-\alias{bind}
 \alias{cbind.sf}
-\alias{bind}
 \alias{st_bind_cols}
 \title{Bind rows (features) of sf objects}
 \usage{
@@ -16,7 +14,7 @@
 st_bind_cols(...)
 }
 \arguments{
-\item{...}{objects to bind}
+\item{...}{objects to bind; note that for the rbind and cbind methods, all objects have to be of class \code{sf}; see \link{dotsMethods}}
 
 \item{deparse.level}{integer; see \link[base]{rbind}}
 
@@ -43,7 +41,7 @@ a = st_sf(a=1, geom = st_sfc(st_point(0:1)), crs = crs)
 b = st_sf(a=1, geom = st_sfc(st_linestring(matrix(1:4,2))), crs = crs)
 c = st_sf(a=4, geom = st_sfc(st_multilinestring(list(matrix(1:4,2)))), crs = crs)
 rbind(a,b,c)
-rbind(a,b) 
+rbind(a,b)
 rbind(a,b)
 rbind(b,c)
 cbind(a,b,c) # warns

@@ -3,32 +3,19 @@
 \name{st_cast}
 \alias{st_cast}
 \alias{st_cast.MULTIPOLYGON}
-\alias{st_cast}
 \alias{st_cast.MULTILINESTRING}
-\alias{st_cast}
 \alias{st_cast.MULTIPOINT}
-\alias{st_cast}
 \alias{st_cast.POLYGON}
-\alias{st_cast}
 \alias{st_cast.LINESTRING}
-\alias{st_cast}
 \alias{st_cast.POINT}
-\alias{st_cast}
 \alias{st_cast.GEOMETRYCOLLECTION}
-\alias{st_cast}
 \alias{st_cast.CIRCULARSTRING}
-\alias{st_cast}
 \alias{st_cast.MULTISURFACE}
-\alias{st_cast}
 \alias{st_cast.COMPOUNDCURVE}
-\alias{st_cast}
+\alias{st_cast.MULTICURVE}
 \alias{st_cast.CURVE}
-\alias{st_cast}
-\alias{st_cast}
 \alias{st_cast.sfc}
-\alias{st_cast}
 \alias{st_cast.sf}
-\alias{st_cast}
 \alias{st_cast.sfc_CIRCULARSTRING}
 \title{Cast geometry to another type: either simplify, or cast explicitly}
 \usage{
@@ -51,6 +38,8 @@
 \method{st_cast}{MULTISURFACE}(x, to, ...)
 
 \method{st_cast}{COMPOUNDCURVE}(x, to, ...)
+
+\method{st_cast}{MULTICURVE}(x, to, ...)
 
 \method{st_cast}{CURVE}(x, to, ...)
 
@@ -89,7 +78,8 @@ Cast geometry to another type: either simplify, or cast explicitly
 the \code{st_cast} method for \code{sf} objects can only split geometries, e.g. cast \code{MULTIPOINT} into multiple \code{POINT} features.  In case of splitting, attributes are repeated and a warning is issued when non-constant attributes are assigned to sub-geometries. To merge feature geometries and attribute values, use \link[sf]{aggregate} or \link[sf]{summarise}.
 }
 \examples{
-example(st_read)
+# example(st_read)
+nc = st_read(system.file("shape/nc.shp", package="sf"))
 mpl <- nc$geometry[[4]]
 #st_cast(x) ## error 'argument "to" is missing, with no default'
 cast_all <- function(xg) {
