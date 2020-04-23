@@ -130,12 +130,12 @@ Ops.sfc <- function(e1, e2) {
 	if (is.numeric(e2) && !is.matrix(e2) && length(e2) <= 2 && .Generic %in% c("+", "-")) {
 		if (.Generic == "-")
 			e2 <- -e2
-		return(opp_sfc(e1, as.numeric(e2), 0L, NA_crs_))
+		return(opp_sfc(e1, as.numeric(e2), 0L, NA_crs_, 0L))
 	} else if (.Generic %in% c("*", "/") && is.numeric(e2) && (length(e2) == 1 || is_only_diag(e2))) {
 		if (is.matrix(e2)) e2 <- diag(e2)
 		if (.Generic == "/")
 			e2 <- 1 / e2
-		return(opp_sfc(e1, as.numeric(e2), 1L, NA_crs_))
+		return(opp_sfc(e1, as.numeric(e2), 1L, NA_crs_, 0L))
 	}
 	if ((is.matrix(e2) && ncol(e2) == 2) || (is.numeric(e2) && length(e2) == 2))
 		e1 = st_zm(e1) # drop z and/or m

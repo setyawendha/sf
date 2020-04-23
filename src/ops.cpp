@@ -1,3 +1,4 @@
+#include <math.h>
 #include <Rcpp.h>
 
 void add_feature(SEXP &feature, SEXP &value) {
@@ -19,6 +20,7 @@ void add_feature(SEXP &feature, SEXP &value) {
 		}
 	}
 }
+
 void mult_feature(SEXP &feature, SEXP &value) {
 	double* p_feature = REAL(feature);
 	double* p_value = REAL(value);
@@ -39,7 +41,31 @@ void mult_feature(SEXP &feature, SEXP &value) {
 	}
 }
 
-void recursive_opp(SEXP &feature, SEXP &value, int mult) {
+void unit_feature(SEXP &feature) { // transforms (row) vectors in unit-length vectors
+	double* p_feature = REAL(feature);
+	if (Rf_isMatrix(feature)) {
+		int nrow = Rf_nrows(feature);
+		int ncol = Rf_ncols(feature);
+		for (int i = 0; i < nrow; i ++) {
+			double l = 0.0;
+			for (int j = 0; j < ncol; j++)
+				l += p_feature[(j * nrow) + i] * p_feature[(j * nrow) + i];
+			l = sqrt(l);
+			for (int j = 0; j < ncol; j++)
+				p_feature[(j * nrow) + i] = p_feature[(j * nrow) + i] / l;
+		}
+	} else {
+		int nfeat = LENGTH(feature); // # nocov start
+		double l = 0.0;
+		for (int i = 0; i < nfeat; i ++)
+			l += p_feature[i] * p_feature[i];
+		l = sqrt(l);
+		for (int i = 0; i < nfeat; i ++)
+			l += p_feature[i] / l;
+	}
+}
+
+void recursive_opp(SEXP &feature, SEXP &value, int mult, bool unit = false) {
 	if (Rf_isVectorList(feature)) {
 		for (int i = 0; i < LENGTH(feature); i++) {
 			SEXP next_feature = VECTOR_ELT(feature, i);
@@ -49,10 +75,12 @@ void recursive_opp(SEXP &feature, SEXP &value, int mult) {
 				next_feature = SET_VECTOR_ELT(feature, i, num_feature);
 				UNPROTECT(1);
 			}
-			recursive_opp(next_feature, value, mult);
+			recursive_opp(next_feature, value, mult, unit);
 		}
 	} else {
-		if (mult) {
+		if (unit) { 
+			unit_feature(feature);
+		} else if (mult) {
 			mult_feature(feature, value);
 		} else {
 			add_feature(feature, value);
@@ -77,12 +105,13 @@ void transform_bbox(SEXP &feature, SEXP &value, int mult) {
 }
 
 //[[Rcpp::export]]
-SEXP opp_sfc(SEXP geom, SEXP value, SEXP mult, SEXP crs) {
+SEXP opp_sfc(SEXP geom, SEXP value, SEXP mult, SEXP crs, SEXP unit_vector) {
 	SEXP new_geom = PROTECT(Rf_duplicate(geom));
 
 	int multiply = INTEGER(mult)[0] == 1;
+	bool unit = INTEGER(unit_vector)[0] == 1;
 
-	recursive_opp(new_geom, value, multiply);
+	recursive_opp(new_geom, value, multiply, unit);
 	transform_bbox(new_geom, value, multiply);
 	Rf_setAttrib(new_geom, Rf_install("crs"), crs);
 

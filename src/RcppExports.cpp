@@ -737,8 +737,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // opp_sfc
-SEXP opp_sfc(SEXP geom, SEXP value, SEXP mult, SEXP crs);
-RcppExport SEXP _sf_opp_sfc(SEXP geomSEXP, SEXP valueSEXP, SEXP multSEXP, SEXP crsSEXP) {
+SEXP opp_sfc(SEXP geom, SEXP value, SEXP mult, SEXP crs, SEXP unit_vector);
+RcppExport SEXP _sf_opp_sfc(SEXP geomSEXP, SEXP valueSEXP, SEXP multSEXP, SEXP crsSEXP, SEXP unit_vectorSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -746,7 +746,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< SEXP >::type value(valueSEXP);
     Rcpp::traits::input_parameter< SEXP >::type mult(multSEXP);
     Rcpp::traits::input_parameter< SEXP >::type crs(crsSEXP);
-    rcpp_result_gen = Rcpp::wrap(opp_sfc(geom, value, mult, crs));
+    Rcpp::traits::input_parameter< SEXP >::type unit_vector(unit_vectorSEXP);
+    rcpp_result_gen = Rcpp::wrap(opp_sfc(geom, value, mult, crs, unit_vector));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1196,7 +1197,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_sf_CPL_nary_intersection", (DL_FUNC) &_sf_CPL_nary_intersection, 1},
     {"_sf_CPL_hex_to_raw", (DL_FUNC) &_sf_CPL_hex_to_raw, 1},
     {"_sf_CPL_raw_to_hex", (DL_FUNC) &_sf_CPL_raw_to_hex, 1},
-    {"_sf_opp_sfc", (DL_FUNC) &_sf_opp_sfc, 4},
+    {"_sf_opp_sfc", (DL_FUNC) &_sf_opp_sfc, 5},
     {"_sf_normalize_sfc", (DL_FUNC) &_sf_normalize_sfc, 4},
     {"_sf_CPL_polygonize", (DL_FUNC) &_sf_CPL_polygonize, 10},
     {"_sf_CPL_rasterize", (DL_FUNC) &_sf_CPL_rasterize, 6},

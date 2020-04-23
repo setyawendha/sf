@@ -229,8 +229,8 @@ CPL_raw_to_hex <- function(raw) {
     .Call('_sf_CPL_raw_to_hex', PACKAGE = 'sf', raw)
 }
 
-opp_sfc <- function(geom, value, mult, crs) {
-    .Call('_sf_opp_sfc', PACKAGE = 'sf', geom, value, mult, crs)
+opp_sfc <- function(geom, value, mult, crs, unit_vector) {
+    .Call('_sf_opp_sfc', PACKAGE = 'sf', geom, value, mult, crs, unit_vector)
 }
 
 normalize_sfc <- function(geom, min, range, crs) {

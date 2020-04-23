@@ -10,13 +10,13 @@
 \alias{s2_area}
 \title{functions for spherical geometry, using s2 package}
 \usage{
-st_as_s2(x)
+st_as_s2(x, to_p4s = s2_p4s)
 
-\method{st_as_sfc}{S2Polygon}(x, ..., crs = st_crs(4326))
+\method{st_as_sfc}{S2Polygon}(x, ..., crs = st_crs(4326), radius = earth_radius)
 
 s2_intersection(x, y)
 
-s2_intersects(x, y)
+s2_intersects(x, y = x)
 
 s2_centroid(x)
 
@@ -40,4 +40,13 @@ functions for spherical geometry, using the s2 package based on the google s2 li
 \code{s2_centroid} computes the spherical centroid of a set of polygons
 
 \code{s2_area} computes the area of a set of polygons, as a fraction of 4 * pi.
+}
+\examples{
+demo(nc, echo = FALSE, ask = FALSE)
+s2_centroid(nc)
+pts = rbind(c(0,80), c(120,80), c(240,80), c(0,80))
+pole = st_sfc(st_polygon(list(pts)), crs = 4326)
+s2_centroid(pole)
+demo(nc, echo = FALSE, ask = FALSE)
+s2_area(nc)
 }
